@@ -1,7 +1,4 @@
-#!/bin/sh
-
-OLDIFS=$IFS
-IFS=";"
+#!/bin/bash
 
 #Variables locales
 id_cont=1
@@ -9,46 +6,46 @@ underscore="_"
 cont=1
 archivos=()
 
-#Variables de entorno
-dir_mae=$MAEDIR
-dir_log=$LOGDIR
-dir_proc=$PROCDIR
+#Variables de entorno temporales hasta que haya script de seteo de variables de entorno
+MAEDIR="MaestrosyTablas_TemaK"
+PROCDIR="procesados"
 
-#Grabar en el log a traves de GrabarBitacora el inicio del sorteo
+fechas_adj="$MAEDIR/FechasAdj.csv.xls" # TODO chequear con los docentes ya que el enunciado dice "fechas_adj.csv"
+dir_sorteos="$PROCDIR/sorteos/"
 
-#Lectura del archivo de entrada y creo archivos de salida
-while read fecha razon
+#Genero el directorio de sorteos en caso de no existir
+mkdir -p "$dir_sorteos"
+#Lectura del archivo CSV de fechas de adjudicación y creación archivos de salida
+while IFS=";" read fecha razon
 do
     #Armo el nombre del archivo
     nombre_arch="$id_cont$underscore$fecha"
     #Reemplazo la barra por un guion
     nombre_salida=$(echo $nombre_arch | sed 's|/|-|g')
-
-    id_cont=$[$id_cont +1]
-
-    #Creo el archivo
-    touch "$dir_proc/$nombre_salida"
+    archivo="$dir_sorteos/$nombre_salida"
 
     #Guardo en el array el nombre del archivo
-    archivos+=($nombre_salida)
-done < "$dir_mae/$1"
-IFS=$OLDIFS
+    archivos+=($archivo)
 
-#Escritura de las salidas de los sorteos
-for i in ${archivos[@]}
+    id_cont=$[$id_cont +1]
+done < $fechas_adj
+
+./GrabarBitacora.sh "GenerarSorteo" "Inicio de Sorteo" "INFO"
+for archivo in "${archivos[@]}"
 do
-echo $i
-    #Inicializo en counter en 1 para la iteracion del archivo actual
+    #Creo el archivo
+    touch $archivo
+    echo "$archivo"
+    #Inicializo el counter en 1 para la iteracion del archivo actual
     cont=1
     #Armo un array con los numeros random del 1 a 168 inclusive
-    numeros=$(shuf -e $(seq 1 168))
+    numeros=$(shuf -i 1-168)
 
     #Escribo en el archivo de salida
     for o in ${numeros[@]}
     do
-        echo "$cont;$o" >> "$dir_proc/$i"
+        echo "$cont;$o" >> $archivo
         cont=$[$cont +1]
     done
 done
-
-#Grabar en el log a traves de GrabarBitacora el cierre del sorteo                                                                                                                                                                                                        55,66       Final
+./GrabarBitacora.sh "GenerarSorteo" "Fin de Sorteo" "INFO"

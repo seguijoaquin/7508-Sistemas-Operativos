@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# TODO permitir dos parámetros; el tercero es opcional
 #Verifico que tenga la cantidad de parametros necesarios
 if [ $# -ne 3 ] 
 then
@@ -10,9 +11,10 @@ fi
 #El directorio de log para el instalador es .CONF/
 #El directorio de log para el resto de los comandos es $LOGDIR
 
-#Variable temporal, comentar en la integracion de los comandos.
+#Variables de entorno temporales hasta que haya script de seteo de variables de entorno
 LOGDIR="./conf/"
 LOGEXT=".log"
+USER="<log in del usuario>"
 #fin variables temporales
 
 #Archivo temporal
@@ -55,6 +57,7 @@ else
 fi
 
 #Si no existe el archivo, lo creo
+mkdir -p $LOGDIR
 touch $LOGFILE
 
 #Selecciono el tipo de log
@@ -86,7 +89,7 @@ if [ $LOGSIZE -gt $LOGMAX ]
 then
 	LINESIZE=`wc -l $LOGFILE | cut -d ' ' -f 1`
 	ENDPOS=`expr $LINESIZE - $LOGLINE`
-    sed "1,"${ENDPOS}"d" $LOGFILE >> $LOGFILETEMP
+	sed "1,"${ENDPOS}"d" $LOGFILE >> $LOGFILETEMP
 	rm $LOGFILE
 	mv $LOGFILETEMP $LOGFILE
 	echo "$DATENOW-$USER-$WAR-LOG Excedido" >> $LOGFILE 
