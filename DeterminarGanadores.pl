@@ -1,37 +1,53 @@
+#!/usr/bin/perl
+
 use strict;
 use warnings;
 use Switch;
 
-my ($option, $idSorteo, $grupo) = @ARGV;
+my ($idSorteo, $grupo, $option) = @ARGV;
 my $input = '';
-my $grupo = 0;
-
-if (not defined $idSorteo) {
-	error_idSorteo();
-}
-
-if (defined $grupo) {
-	#revisar el tipo de entrada para parsear
-}
 
 if(defined $option)
 {
-	if(($option != "-a") || ($option != "-g"))
+	if(($option ne "-a") && ($option ne "-g"))
 	{
 		error_opcion();
 	}
-	if($option == "-a")
+	if($option eq "-a")
 	{
 		mostrar_ayuda();
 	}
 	else
 	{
-		procesar();
+		if(not defined $idSorteo)
+		{
+			error_idSorteo();
+		}
+		else
+		{
+			if(not defined $grupo)
+			{
+				error_grupo();
+			}
+			else
+			{
+				#TODO: Ver manejo de grupos antes de procesar, puede venir un solo numero (ej: 7), un rango (7-9) o un conjunto (7,8,9)
+				procesar();
+			}
+		}
 	}
 }
+else
+{
+	procesar();
+}
+
 
 sub procesar
 {
+	#Ejecucion de los procesos para determinar ganadores
+	ejecutar_proceso();
+
 	while ($input ne '5')
 	{
 		clear_screen();
@@ -76,6 +92,11 @@ sub procesar
 	}
 }
 
+sub ejecutar_proceso
+{
+	#TODO: Logica del proceso
+}
+
 sub mostrar_resultados_grupo
 {
 	#TODO: Mostrar resultados por grupo
@@ -98,12 +119,27 @@ sub mostrar_resutado_general
 
 sub error_opcion
 {
-	#TODO: Error en la opcion de entrada
+	print "Opcion incorrecta\n";
+	exit 1;
+}
+
+sub error_idSorteo
+{
+	print "No se ha encontrado el id de sorteo\n";
+	exit 2;
+}
+
+sub error_grupo
+{
+	print "No se ha encontrado el o los grupos para operar\n";
+	exit 3;
 }
 
 sub mostrar_ayuda
 {
-	#TODO: Mostrar ayuda, parametro de entrada -a
+	#TODO: Armar  ayuda
+	print "Ayuda del comando blablabla\n";
+	exit 4;
 }
 
 sub clear_screen
