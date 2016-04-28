@@ -1,56 +1,36 @@
 #!/usr/bin/perl
 
+use Getopt::Std;
 use strict;
-use warnings;
 use Switch;
+use warnings;
 
-my ($idSorteo, $grupo, $option) = @ARGV;
-my $input = '';
+my %opts;
+getopts('ag', \%opts) or die mostrar_ayuda();
 
-if(defined $option)
+if(defined $opts{a})
 {
-	if(($option ne "-a") && ($option ne "-g"))
-	{
-		error_opcion();
-	}
-	if($option eq "-a")
-	{
-		mostrar_ayuda();
-	}
-	else
-	{
-		if(not defined $idSorteo)
-		{
-			error_idSorteo();
-		}
-		else
-		{
-			if(not defined $grupo)
-			{
-				error_grupo();
-			}
-			else
-			{
-				#TODO: Ver manejo de grupos antes de procesar, puede venir un solo numero (ej: 7), un rango (7-9) o un conjunto (7,8,9)
-				procesar();
-			}
-		}
-	}
+	mostrar_ayuda();
 }
 else
 {
+	my $idSorteo = shift or die error_idSorteo();
+	my $grupo = shift or die error_grupo();
+	#TODO: Ver manejo de grupos antes de procesar,
+	#puede venir un solo numero (ej: 7),
+	#un rango (7-9) o un conjunto (7,8,9)
 	procesar();
 }
-
 
 sub procesar
 {
 	#Ejecucion de los procesos para determinar ganadores
 	ejecutar_proceso();
 
+	my $input = '';
 	while ($input ne '5')
 	{
-		clear_screen();
+		limpiar_pantalla();
 
 		print "1. Resultado general del sorteo\n".
 			  "2. Ganadores por sorteo\n".
@@ -117,12 +97,6 @@ sub mostrar_resutado_general
 	#TODO: Mostrar resultado general
 }
 
-sub error_opcion
-{
-	print "Opcion incorrecta\n";
-	exit 1;
-}
-
 sub error_idSorteo
 {
 	print "No se ha encontrado el id de sorteo\n";
@@ -137,12 +111,11 @@ sub error_grupo
 
 sub mostrar_ayuda
 {
-	#TODO: Armar  ayuda
-	print "Ayuda del comando blablabla\n";
+	print "Las opciones válidas son -a (ayuda) y -g (grabar a archivo).\n";
 	exit 4;
 }
 
-sub clear_screen
+sub limpiar_pantalla
 {
     system("clear");
 }
