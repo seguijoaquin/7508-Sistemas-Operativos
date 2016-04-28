@@ -29,35 +29,35 @@ function MoverArchivos {
 	#validacion origen no es vacio
 	if [[ "$origen" == "" ]]
 	then
-		GrabarBitacora $comando_inv "MoverArchivos: Parametro origen vacio." ERROR
+		./GrabarBitacora.sh "$comando_inv" "MoverArchivos: Parametro origen vacio." "ERROR"
 		return 1
 	fi
 
 	#validacion destino no es vacio
 	if [[ "$destino" == "" ]]
 	then
-		GrabarBitacora $comando_inv "MoverArchivos: Parametro destino vacio." ERROR
+		./GrabarBitacora.sh "$comando_inv" "MoverArchivos: Parametro destino vacio." "ERROR"
 		return 2
 	fi
 
 	#valido si el origen y destino son iguales
 	if [[ "$origen" == "$destino" ]]
 	then
-		GrabarBitacora $comando_inv "MoverArchivos: Direccion de origen coincide con la de destino." ERROR
+		./GrabarBitacora.sh "$comando_inv" "MoverArchivos: Direccion de origen coincide con la de destino." "ERROR"
 		return 3
 	fi
 
 	#valido si el archivo de origen existe
 	if [ ! -e "$origen" ]
 	then
-		GrabarBitacora $comando_inv "MoverArchivos: Archivo de origen no existe." ERROR
+		./GrabarBitacora.sh "$comando_inv" "MoverArchivos: Archivo de origen no existe." "ERROR"
 		return 4
 	fi
 
 	#valido si existe el directorio destino
 	if [ ! -e "$dir_destino" ]
 	then
-		GrabarBitacora $comando_inv "MoverArchivos: Direccion de destino no existe." ERROR
+		./GrabarBitacora.sh "$comando_inv" "MoverArchivos: Direccion de destino no existe." "ERROR"
 		return 5
 	fi
 
@@ -65,17 +65,17 @@ function MoverArchivos {
 	if [ ! -e "$destino" ]
 	then
 		mv "$origen" "$destino"
-		GrabarBitacora $comando_inv "MoverArchivos: El archivo fue movido. Origen: \"$origen\". Destino: \"$destino\"."
+		./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo fue movido. Origen: \"$origen\". Destino: \"$destino\"." "INFO"
 	else
 		mkdir -p "${dir_destino}/dpl"
 		if [ ! -e "${dir_destino}/dpl/${filename_destino}" ]
 		then
 			mv "$origen" "${dir_destino}/dpl/${filename_destino}"
-			GrabarBitacora $comando_inv "MoverArchivos: El archivo ya existe en destino, se almacena como duplicado. Origen: \"$origen\". Destino: \"$destino\"."
+			./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo ya existe en destino, se almacena como duplicado. Origen: \"$origen\". Destino: \"$destino\"."
 		else
 			sec_duplicados=`expr $sec_duplicados + 1`
 			mv "$origen" "${dir_destino}/dpl/${filename_destino}.${contador}"
-			GrabarBitacora $comando_inv "MoverArchivos: El archivo ya existe en destino y como duplicado, se renombra. Origen: \"$origen\". Destino: \"$destino\"."
+			./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo ya existe en destino y como duplicado, se renombra. Origen: \"$origen\". Destino: \"$destino\"."
 		fi
 	
 	fi
