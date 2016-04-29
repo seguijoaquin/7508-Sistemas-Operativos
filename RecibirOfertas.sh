@@ -10,7 +10,8 @@ NOKDIR="./Rechazados"
 
 
 CONCESIONARIOS="$MAEDIR/concesionarios.csv.xls"
-SLEEPTIME=5 #TODO: Cambiar el tiempo
+FECHAS_ADJUDICACION="$MAEDIR/FechasAdj.csv.xls"
+SLEEPTIME=35
 ciclo=0
 
 function hayArchivos()
@@ -34,7 +35,6 @@ function esArchivoDeTexto()
 		return 0
 	fi
 	# El archivo no es de texto
-	#echo "Archivo invalido es de tipo `file --mime-type $archivo`"
 	return 1
 }
 
@@ -61,10 +61,47 @@ function concesionarioValido()
 	return 1
 }
 
+function calcularFechaUltimoActo()
+{
+	fechaUltimoActo="19900101" # Seteo una fecha para calcular luego
+	IFS="
+	" #Determina el internal field separator
+
+	while read -r fecha
+	do
+		# Verifica que sea una fecha valida
+		if date -d "${fecha:6:4}${fecha:3:2}${fecha:0:2}" &> /dev/null
+		then
+			# Verifica que la fecha sea menor a la fecha actual
+			if (( ($(date -d "${fecha:6:4}${fecha:3:2}${fecha:0:2}" +%s) < $(date +%s)) ))
+			then
+				# Verifica que la fecha guardada anteriormente no sea posterior a esta
+				if (( ($(date -d "${fecha:6:4}${fecha:3:2}${fecha:0:2}" +%s) > $(date -d "$fechaUltimoActo" +%s)) ))
+				then
+					fechaUltimoActo="${fecha:6:4}${fecha:3:2}${fecha:0:2}"
+				fi
+			fi
+		fi
+	done < $FECHAS_ADJUDICACION
+	#echo $fechaUltimoActo
+}
+
 function fechaValida()
 {
-	#TODO: Implementar
-	return 0
+	# Verifica que sea una fecha valida (existente)
+	if date -d "${1:5:4}${1:9:2}${1:11:2}" &> /dev/null
+	then
+		#Verifica que sea menor o igual a la fecha del día.
+		if (( ($(date -d "${1:5:4}${1:9:2}${1:11:2}" +%s) <= $(date +%s)) ))
+		then
+			# Verifica que sea mayor a la fecha del último acto de adjudicación.
+			if (( ($(date -d "${1:5:4}${1:9:2}${1:11:2}" +%s) > $(date -d "$fechaUltimoActo" +%s)) ))
+			then
+				return 0
+			fi
+		fi
+	fi
+	return 1
 }
 
 function procesarNovedades
@@ -73,10 +110,11 @@ function procesarNovedades
 	archivoAceptado=false
 	mensaje=""
 
+	calcularFechaUltimoActo # Setea la variable fechaUltimoActo
+				# Es calculada aqui porque sera la misma para todas las novedades de esta ejecucion
+
 	for archivo in $listaNovedades
 	do
-		#echo "Archivo encontrado: $archivo" 		#Borrar esta linea de prueba
-
 		#Validar tipo de archivo
 		if esArchivoDeTexto $archivo
 		then
@@ -87,8 +125,13 @@ function procesarNovedades
 				then
 					if fechaValida $archivo
 					then
-						mensaje="El archivo $archivo ha sido aceptado"
-						archivoAceptado=true
+						if [ ! `more "$ARRIDIR/$archivo" | wc -w` -eq 0 ] #Verifica que no sea un archivo vacio
+						then
+							mensaje="El archivo $archivo ha sido aceptado"
+							archivoAceptado=true
+						else
+							mensaje="Se rechazo el archivo $archivo, este se encuentra vacio"
+						fi
 					else
 						mensaje="Se rechazo el archivo $archivo, este posee una fecha invalida"
 					fi
@@ -96,10 +139,10 @@ function procesarNovedades
 					mensaje="Se rechazo el archivo $archivo, este posee un concesionario invalido"
 				fi
 			else
-				mensaje="Se rechazo el archivo $archivo, este posee un nombre invalido"
+				mensaje="Se rechazo el archivo $archivo, este posee un formato de nombre invalido"
 			fi
 		else
-			mensaje="Se rechazo el archivo $archivo, este posee un formato invalido"
+			mensaje="Se rechazo el archivo $archivo, este no es un archivo de texto"
 		fi
 
 		# Guardo el suceso en la bitacora
@@ -117,9 +160,9 @@ function procesarNovedades
 	done
 }
 
-#-----------------------------------------------------------------------#
-#----------------------------Bucle Principal----------------------------#
-#-----------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------#
+#----------------------------------------Bucle Principal----------------------------------------#
+#-----------------------------------------------------------------------------------------------#
 
 ./GrabarBitacora.sh "RecibirOfertas" "                     NUEVA EJECUCION" "INFO"
 while [[ true ]]
@@ -134,7 +177,13 @@ do
 		procesarNovedades
 	else
 		./GrabarBitacora.sh "RecibirOfertas" "Aun no se registran archivos recibidos." "INFO"
-		echo "Ciclo nro. $ciclo: No hay archivos de novedades"
+		#echo "Ciclo nro. $ciclo: No hay archivos de novedades"
+	fi
+
+	if hayArchivos $OKDIR
+	then
+		#TODO: Verificar que no este corriendo ProcesarOfertas y ejecutar si no lo esta.
+		./GrabarBitacora.sh "RecibirOfertas" "Invocar a ProcesarOfertas" "INFO"
 	fi
 	sleep $SLEEPTIME
 done
