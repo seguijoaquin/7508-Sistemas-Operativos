@@ -19,6 +19,7 @@ else
 	#TODO: Ver manejo de grupos antes de procesar,
 	#puede venir un solo numero (ej: 7),
 	#un rango (7-9) o un conjunto (7,8,9)
+	flock(DATA, 6) or die error_lock(); # 6 = non-blocking lock
 	procesar();
 }
 
@@ -33,10 +34,10 @@ sub procesar
 		limpiar_pantalla();
 
 		print "1. Resultado general del sorteo\n".
-			  "2. Ganadores por sorteo\n".
-			  "2. Ganadores por licitacion\n". 
-			  "4. Resultados por grupo\n". 
-			  "5. Salir\n";
+		      "2. Ganadores por sorteo\n".
+		      "2. Ganadores por licitacion\n". 
+		      "4. Resultados por grupo\n". 
+		      "5. Salir\n";
 
 		print "Seleccione una opción: ";
 		$input = <STDIN>;
@@ -97,6 +98,12 @@ sub mostrar_resutado_general
 	#TODO: Mostrar resultado general
 }
 
+sub error_lock
+{
+	print "Ya existe otro comando DeterminarGanadores en ejecución\n";
+	exit 2;
+}
+
 sub error_idSorteo
 {
 	print "No se ha encontrado el id de sorteo\n";
@@ -117,5 +124,9 @@ sub mostrar_ayuda
 
 sub limpiar_pantalla
 {
-    system("clear");
+	system("clear");
 }
+
+# Esto nos permite usar un lock sin tener que crear un nuevo archivo,
+#  usando el filehandle <DATA>
+__END__
