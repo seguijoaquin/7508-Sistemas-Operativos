@@ -27,11 +27,11 @@ VERSIONPERL=5
 #*************************** Funciones ***************************
 function log() {
         command=$1
-        message=$2 
+        message=$2
         type=$3
-        if [ $# -ge 2 ] && [ $# -le 3 ] 
+        if [ $# -ge 2 ] && [ $# -le 3 ]
         then
-			$LOGCOMMAND "$command" "$message" "$type" 
+			$LOGCOMMAND "$command" "$message" "$type"
         fi
 }
 
@@ -41,18 +41,18 @@ function initInstalation(){
 		clear
 	#Verifico version de perl instalada
 	log "Installer" "Verificando versión de perl instalada" "I"
-		
+
 	PERLVERSION=$(perl -v | grep 'v[0-9]\.[0-9]\+\.[0-9]*' -o) #obtengo la version de perl
 	NUMPERLVERSION=$(echo $PERLVERSION | cut -d"." -f1 | sed 's/^v\([0-9]\)$/\1/') #obtengo el primer numero
-	
+
 	if [ -z "$NUMPERLVERSION" ] || [ $NUMPERLVERSION -lt $VERSIONPERL ]
 	then
 		echo "Para ejecutar el sistema CIPAK es necesario contar con Perl $VERSIONPERL o superior."
 		echo "Efectúe su instalación e inténtelo nuevamente."
 		echo "Proceso de Instalación Cancelado"
-		log  "Installer" "Para ejecutar el sistema CIPAK es necesario contar con Perl $VERSIONPERL o superior." "E"	
-		log  "Installer"  "Efectúe su instalación e inténtelo nuevamente." "E"	
-		log  "Installer"  "Proceso de Instalación Cancelado" "E"	
+		log  "Installer" "Para ejecutar el sistema CIPAK es necesario contar con Perl $VERSIONPERL o superior." "E"
+		log  "Installer"  "Efectúe su instalación e inténtelo nuevamente." "E"
+		log  "Installer"  "Proceso de Instalación Cancelado" "E"
 		exit 3;
 	else
 		echo ""
@@ -81,24 +81,24 @@ function initInstalation(){
 		log "Installer" "Usuario NO acepto ACUERDO DE LICENCIA DE SOFTWARE"
 		exit 2
 	fi
-	
+
 	#Usuario Acepto los terminos
 	log "Installer" "Usuario acepto ACUERDO DE LICENCIA DE SOFTWARE" "I"
-	
-	
+
+
 	#Si existe vuelvo a generar el archivo de configuracion temporal
 	if [ -a $CONFIGFILETEMP ]
-	then 
+	then
 		rm $CONFIGFILETEMP
 		touch $CONFIGFILETEMP
 	fi
-	
+
 	echo "GRUPO=$BASEDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
-	getDirectoryPath "Defina el directorio de instalación de los ejecutables ($BINDIR):" "$BINDIR" 
+	getDirectoryPath "Defina el directorio de instalación de los ejecutables ($BINDIR):" "$BINDIR"
 	BINDIR=$pathTemp
 	echo "BINDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
-	
+
 	getDirectoryPath "Defina directorio para maestros ($MAEDIR):" "$MAEDIR"
 	MAEDIR=$pathTemp
 	echo "MAEDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
@@ -110,21 +110,21 @@ function initInstalation(){
 	readNumber "Defina espacio mínimo libre para la recepción de archivos de novedades en Mbytes ($DATASIZE)" "$DATASIZE"
 	DATASIZETEMP=$numberTemp
 	DATASIZEDIR=$(df -B1024 "$ACTUALDIR" | tail -n1 | sed -e"s/\s\{1,\}/;/g" | cut -f4 -d';')
-	DATASIZEDIR=$(echo "scale=0 ; $DATASIZEDIR/1024" | bc -l) #lo paso a Mb	
+	DATASIZEDIR=$(echo "scale=0 ; $DATASIZEDIR/1024" | bc -l) #lo paso a Mb
 
-	while [ $DATASIZEDIR -lt $DATASIZETEMP ] 
+	while [ $DATASIZEDIR -lt $DATASIZETEMP ]
 	do
 		echo "Insuficiente espacio en disco."
 		echo "Espacio disponible: $DATASIZEDIR Mb."
 		echo "Espacio requerido $DATASIZETEMP Mb"
 		echo "Inténtelo nuevamente."
-		echo ""	
+		echo ""
 		readNumber "Defina espacio mínimo libre para la recepción de archivos de novedades en Mbytes ($DATASIZE)" "$DATASIZE"
 		DATASIZETEMP=$numberTemp
 	done
 	DATASIZE=$DATASIZETEMP
 	echo "DATASIZE=$DATASIZETEMP=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
-	
+
 	getDirectoryPath "Defina el directorio de grabación de los archivos aceptados ($OKDIR):" "$OKDIR"
 	OKDIR=$pathTemp
 	echo "OKDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
@@ -136,11 +136,11 @@ function initInstalation(){
 
 	#Directorio de grabacion de los reportes
 	getDirectoryPath "Defina el directorio de grabación los reportes ($INFODIR):" "$INFODIR"
-	INFODIR=$pathTemp	
+	INFODIR=$pathTemp
 	echo "INFODIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
 	getDirectoryPath "Defina el directorio de logs ($LOGDIR):" "$LOGDIR"
-	LOGDIR=$pathTemp	
+	LOGDIR=$pathTemp
 	echo "LOGDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
 	getExtension "Ingrese la extensión para los archivos de log ($LOGEXT): " "$LOGEXT"
@@ -150,14 +150,14 @@ function initInstalation(){
 	readNumber "Defina el tamaño máximo para los archivos $LOGEXT en Kbytes ($LOGSIZE)" "$LOGSIZE"
 	LOGSIZETEMP=$numberTemp
 	LOGSIZEDISP=$(df -B1024 "$ACTUALDIR" | tail -n1 | sed -e"s/\s\{1,\}/;/g" | cut -f4 -d';')
-	
-	while [ $LOGSIZEDISP -lt $LOGSIZETEMP ] 
+
+	while [ $LOGSIZEDISP -lt $LOGSIZETEMP ]
 	do
 		echo "Insuficiente espacio en disco."
 		echo "Espacio disponible: $LOGSIZEDISP Kb."
 		echo "Espacio requerido $LOGSIZETEMP Kb"
 		echo "Cancele la instalación o inténtelo nuevamente."
-		echo ""	
+		echo ""
 		readNumber "Defina el tamaño máximo para los archivos $LOGEXT en Kbytes ($LOGSIZE)" "$LOGSIZE"
 		LOGSIZETEMP=$numberTemp
 	done
@@ -165,18 +165,18 @@ function initInstalation(){
 	echo "LOGSIZE=$LOGSIZETEMP=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
 	getDirectoryPath "Defina el directorio de grabación los archivos rechazados ($NOKDIR):" "$NOKDIR"
-	NOKDIR=$pathTemp	
+	NOKDIR=$pathTemp
 	echo "NOKDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 }
 
 function getDirectoryPath(){
 	msj=$1
 	pathDefault=$2
-	pathTemp=""	
-	
+	pathTemp=""
+
 	while [ -z $pathTemp ]
 	do
-		read -p "$msj" pathTemp	
+		read -p "$msj" pathTemp
 		#echo "de nuevo: $pathTemp"
 		if [ -z "$pathTemp" ]
 		then
@@ -188,12 +188,12 @@ function getDirectoryPath(){
 			#valido que no se pueda seleccionar el directorio conf
 			pathTemp=$(echo "$pathTemp" | grep -v '^/conf$' )
 			if [ ! -z "$pathTemp" -a "$pathTemp" != " " ]
-			then	
-				pathTemp=$GRUPO$pathTemp	
+			then
+				pathTemp=$GRUPO$pathTemp
 			else
 				echo 'Path invalido ingrese nuevamente'
 			fi
-		fi		
+		fi
 	done
 }
 
@@ -214,7 +214,7 @@ function getExtension(){
 			then
 				extDefault=$extTemp
 			fi
-		fi		
+		fi
 	done
 }
 
@@ -225,14 +225,14 @@ function readNumber(){
 
 	while [ -z $numberTemp ]
 	do
-		read -p "$msj: " result 
+		read -p "$msj: " result
 
-		#Si pulso enter pongo el valor por defecto    	
+		#Si pulso enter pongo el valor por defecto
 		if [ -z $result ]
 		then
 			result=$numberDefault
-		fi	
-		
+		fi
+
 		numberTemp=$(echo $result | grep '^[0-9]*$')
 	done
 
@@ -251,9 +251,9 @@ function executeInstaler(){
 		*************************************************************
     '
     echo "
-	Directorio de Configuracion: $CONFDIR 
-	Directorio de Ejecutables:   $BINDIR 
-	Directorio de  Maestros: $MAEDIR 
+	Directorio de Configuracion: $CONFDIR
+	Directorio de Ejecutables:   $BINDIR
+	Directorio de  Maestros: $MAEDIR
 	Directorio de recepción de archivos de novedades:  $ARRIDIR
 	Espacio mínimo libre para arribos: $DATASIZE Mb
 	Directorio de  archivos aceptados: $OKDIR
@@ -265,7 +265,7 @@ function executeInstaler(){
 	Estado de la instalación: $STATUSINST
 		"
 
-		read -p "Iniciando Instalación. Esta Ud. seguro? (Si - No): " optIniciar 
+		read -p "Iniciando Instalación. Esta Ud. seguro? (Si - No): " optIniciar
 		optIniciar=$(echo $optIniciar | grep '^[Ss][Ii]$\|^[Nn][Oo]$' | tr '[:upper:]' '[:lower:]')
 	done
 
@@ -278,11 +278,11 @@ function executeInstaler(){
 	fi
 
 	if [ -d $BASEDIR$GRUPO ]
-	then	
+	then
 		deletDirOpt=""
 		while [ -z $deletDirOpt ]
 		do
-			read -p "Existen una instalación en el directorio $BASEDIR$GRUPO, se borraran todos los datos para realizar la nueva instalacion, esta seguro? (Si - No): " deletDirOpt 
+			read -p "Existen una instalación en el directorio $BASEDIR$GRUPO, se borraran todos los datos para realizar la nueva instalacion, esta seguro? (Si - No): " deletDirOpt
 			optSelect=$(echo $deletDirOpt | grep '^[Ss][Ii]$\|^[Nn][Oo]$' | tr '[:upper:]' '[:lower:]')
 		done
 
@@ -296,7 +296,7 @@ function executeInstaler(){
 		fi
 	fi
 
-	clear	
+	clear
 	echo "Creando Estructuras de directorio. . . . "
 	echo $BASEDIR$BINDIR
 	mkdir -p $BASEDIR$BINDIR
@@ -329,10 +329,10 @@ function executeInstaler(){
 
 	#Mover los ejecutables y funciones al directorio BINDIR mostrando el siguiente mensaje
 	echo "Instalando Programas y Funciones"
-	#Muevo el script para mover archivos	
+	#Muevo el script para mover archivos
 	#for i in $(ls *.sh *.pl)
 	for i in $(ls *.sh)
-	 do 
+	 do
 		cp "$i" "$BASEDIR$BINDIR/$i"
 		chmod u+x "$BASEDIR$BINDIR/$i"
 	done
@@ -348,16 +348,16 @@ function executeInstaler(){
 		cp "$CONFDIR/$i" "$BASEDIR$GRUPO/conf/$i"
 	done
 
-	LOGCOMMAND="$BASEDIR$BINDIR/GraLog.sh"
+	LOGCOMMAND="$BASEDIR$BINDIR/GrabarBitacora.sh"
 
 	#Mover los archivos maestros y tablas al directorio MAEDIR mostrando el siguiente mensaje
 	echo "Instalando Archivos Maestros y Tablas"
 	#for i in $(ls $DATOSDIR)
-	# do 
+	# do
 	#cp "$DATOSDIR/$i" "$BASEDIR$MAEDIR/"
-	#done	
-	
-	
+	#done
+
+
 	#Actualizar el archivo de configuración mostrando el siguiente mensaje
 	echo "Actualizando la configuración del sistema"
 	log "Installer" "Actualizando la configuración del sistema" "I"
@@ -370,42 +370,42 @@ function executeInstaler(){
 
 	echo "Instalación CONCLUIDA"
 	log "Installer" "Instalación CONCLUIDA" "I"
-	
+
 	#Elimino Archivos
 	#rm -rf ./Datos
 	#rm -rf $CONFDIR
 	#rm *.sh
 	#rm *.pl
 	#rm *.md
-	
-	
+
+
 }
 
 
 #Si no existe la carpeta de configuracion la creo.
 if [ ! -d $CONFDIR ]
-	then	
+	then
 	mkdir -p $CONFDIR
 fi
 
 #Otorgo permisos a los comando que voy a utilizar
 chmod u+r+x $LOGCOMMAND
-	
+
 #Inicio del instalador
-log "Installer" "Inicio de Ejecución de Installer" 
+log "Installer" "Inicio de Ejecución de Installer"
 
 echo "Log de la instalación: $CONFDIR/$LOGFILEINS"
-log "Installer" "Log de la instalación: $CONFDIR/$LOGFILEINS" 
+log "Installer" "Log de la instalación: $CONFDIR/$LOGFILEINS"
 
 echo "Directorio predefinido de configuración: $GRUPO/conf"
 log "Installer" "Directorio predefinido de configuración: $GRUPO/conf"
- 
+
 #Detecto si hay una instalacion previa
-if [ -a $CONFIGFILETEMP ] 
+if [ -a $CONFIGFILETEMP ]
 then
 	#Hay una instalación previa
 	log "Installer" "Hay una instalación" "I"
-		
+
 	BASEDIRTMP=$(grep '^GRUPO' $CONFIGFILETEMP | awk -F"=" '{print $2}')
 	BINDIRTMP=$(grep '^BINDIR' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
 	MAEDIRTMP=$(grep '^MAEDIR' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
@@ -418,109 +418,109 @@ then
 	LOGEXTTMP=$(grep '^LOGEXT' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
 	LOGSIZETMP=$(grep '^LOGSIZE' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
 	NOKDIRTMP=$(grep '^NOKDIR' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
-	
-	declare -a VAR_FALTANTES; #Array con los directorios que falta configurar 
-	declare -a VAR_COMPLETO; #Array con los directorios que falta configurar 
-	
+
+	declare -a VAR_FALTANTES; #Array con los directorios que falta configurar
+	declare -a VAR_COMPLETO; #Array con los directorios que falta configurar
+
 	if [ -z $BASEDIRTMP ]
 	then
 		echo "GRUPO=$BASEDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 	fi
 
 	if [ -z $BINDIRTMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} BINDIR)
 	else
 		BINDIR=$BINDIRTMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} BINDIR)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} BINDIR)
 	fi
 
 	if [ -z $MAEDIRTMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} MAEDIR)
 	else
 		MAEDIR=$MAEDIRTMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} MAEDIR)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} MAEDIR)
 	fi
 
 	if [ -z $ARRIDIRTMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} ARRIDIR)
 	else
 		ARRIDIR=$ARRIDIRTMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} ARRIDIR)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} ARRIDIR)
 	fi
 
 	if [ -z $DATASIZETMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} DATASIZE)
 	else
 		DATASIZE=$DATASIZETMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} DATASIZE)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} DATASIZE)
 	fi
 
 	if [ -z $OKDIRTMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} OKDIR)
 	else
 		OKDIR=$OKDIRTMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} OKDIR)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} OKDIR)
 	fi
-		
+
 	if [ -z $PROCDIRTMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} PROCDIR)
 	else
 		PROCDIR=$PROCDIRTMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} PROCDIR)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} PROCDIR)
 	fi
 
 	if [ -z $INFODIRTMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} INFODIR)
 	else
 		INFODIR=$INFODIRTMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} INFODIR)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} INFODIR)
 	fi
 
 	if [ -z $LOGDIRTMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} LOGDIR)
 	else
 		LOGDIR=$LOGDIRTMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} LOGDIR)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} LOGDIR)
 	fi
 
 	if [ -z $LOGEXTTMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} LOGEXT)
 	else
 		LOGEXT=$LOGEXTTMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} LOGEXT)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} LOGEXT)
 	fi
 
 	if [ -z $LOGSIZETMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} LOGSIZE)
 	else
 		LOGSIZE=$LOGSIZETMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} LOGSIZE)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} LOGSIZE)
 	fi
 
 	if [ -z $NOKDIRTMP ]
-	then 
+	then
 		VAR_FALTANTES=( ${VAR_FALTANTES[*]} NOKDIR)
 	else
 		NOKDIR=$NOKDIRTMP
-		VAR_COMPLETO=( ${VAR_COMPLETO[*]} NOKDIR)	
+		VAR_COMPLETO=( ${VAR_COMPLETO[*]} NOKDIR)
 	fi
 
 	if [ ${#VAR_FALTANTES[@]} -eq 0 ] #No falta ninguna variable en el archivo temporal
-	then	
+	then
 		initInstalation
-	else	
+	else
 	echo "Direct. de Configuracion: $CONFDIR"
-		
+
 	for VARVALUE in "${VAR_COMPLETO[@]}"; do
 		case $VARVALUE in
 			BINDIR )
@@ -548,8 +548,8 @@ then
 			esac
 	done
 
-	echo ""	
-	echo "Componentes Faltantes: "	
+	echo ""
+	echo "Componentes Faltantes: "
 	for VARVALUE in "${VAR_FALTANTES[@]}"
 	do
 		case $VARVALUE in
@@ -578,11 +578,11 @@ then
 			esac
 	done
 	echo ""
-	echo "Estado de la instalación: INCOMPLETA"	
+	echo "Estado de la instalación: INCOMPLETA"
 
 	while [ -z $optSelect ]
 	do
-		read -p " Desea completar la instalación? (Si - No): " optSelect 
+		read -p " Desea completar la instalación? (Si - No): " optSelect
 		optSelect=$(echo $optSelect | grep '^[Ss][Ii]$\|^[Nn][Oo]$' | tr '[:upper:]' '[:lower:]')
 	done
 		if [ $optSelect = "no" ]
@@ -594,7 +594,7 @@ then
 	for VARVALUE in "${VAR_FALTANTES[@]}"; do
 		case $VARVALUE in
 			BINDIR )
-				getDirectoryPath "Defina el directorio de instalación de los ejecutables ($BINDIR):" "$BINDIR" 
+				getDirectoryPath "Defina el directorio de instalación de los ejecutables ($BINDIR):" "$BINDIR"
 				BINDIR=$pathTemp
 				echo "BINDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP;;
 			MAEDIR )
@@ -609,15 +609,15 @@ then
 				readNumber "Defina espacio mínimo libre para el arribo de archivos de novedades en Mbytes ($DATASIZE)" "$DATASIZE"
 				DATASIZETEMP=$numberTemp
 				DATASIZEDIR=$(df -B1024 "$ACTUALDIR" | tail -n1 | sed -e"s/\s\{1,\}/;/g" | cut -f4 -d';')
-				DATASIZEDIR=$(echo "scale=0 ; $DATASIZEDIR/1024" | bc -l) #lo paso a Mb	
+				DATASIZEDIR=$(echo "scale=0 ; $DATASIZEDIR/1024" | bc -l) #lo paso a Mb
 
-				while [ $DATASIZEDIR -lt $DATASIZETEMP ] 
+				while [ $DATASIZEDIR -lt $DATASIZETEMP ]
 				do
 					echo "Insuficiente espacio en disco."
 					echo "Espacio disponible: $DATASIZEDIR Mb."
 					echo "Espacio requerido $DATASIZETEMP Mb"
 					echo "Inténtelo nuevamente."
-					echo ""	
+					echo ""
 					readNumber "Defina espacio mínimo libre para el arribo de archivos de novedades en Mbytes ($DATASIZE)" "$DATASIZE"
 					DATASIZETEMP=$numberTemp
 				done
@@ -633,11 +633,11 @@ then
 				echo "PROCDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP;;
 			INFODIR )
 				getDirectoryPath "Defina el directorio de grabación de los reportes ($INFODIR):" "$INFODIR"
-				INFODIR=$pathTemp	
+				INFODIR=$pathTemp
 				echo "INFODIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP;;
 			LOGDIR )
 				getDirectoryPath "Defina el directorio de logs ($LOGDIR):" "$LOGDIR"
-				LOGDIR=$pathTemp	
+				LOGDIR=$pathTemp
 				echo "LOGDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP;;
 			LOGEXT )
 				getExtension "Ingrese la extensión para los archivos de log ($LOGEXT): " "$LOGEXT"
@@ -647,15 +647,15 @@ then
 				readNumber "Defina el tamaño máximo para los archivos $LOGEXT en Kbytes ($LOGSIZE)" "$LOGSIZE"
 				LOGSIZETEMP=$numberTemp
 				LOGSIZEDISP=$(df -B1024 "$ACTUALDIR" | tail -n1 | sed -e"s/\s\{1,\}/;/g" | cut -f4 -d';')
-				#LOGSIZEDISP=$(echo "scale=0 ; $LOGSIZEDISP/1024" | bc -l) #lo paso a Mb	
-		
-				while [ $LOGSIZEDISP -lt $LOGSIZETEMP ] 
+				#LOGSIZEDISP=$(echo "scale=0 ; $LOGSIZEDISP/1024" | bc -l) #lo paso a Mb
+
+				while [ $LOGSIZEDISP -lt $LOGSIZETEMP ]
 				do
 					echo "Insuficiente espacio en disco."
 					echo "Espacio disponible: $LOGSIZEDISP Kb."
 					echo "Espacio requerido $LOGSIZETEMP Kb"
 					echo "Inténtelo nuevamente."
-					echo ""	
+					echo ""
 					readNumber "Defina el tamaño máximo para los archivos $LOGEXT en Kbytes ($LOGSIZE)" "$LOGSIZE"
 					LOGSIZETEMP=$numberTemp
 				done
@@ -663,9 +663,9 @@ then
 				echo "LOGSIZE=$LOGSIZETEMP=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP;;
 			NOKDIR )
 				getDirectoryPath "Defina el directorio de grabación de los reportes ($NOKDIR):" "$NOKDIR"
-				NOKDIR=$pathTemp	
+				NOKDIR=$pathTemp
 				echo "NOKDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP;;
-		esac		
+		esac
 	done
 	fi
 
@@ -676,7 +676,7 @@ else
 	log "Installer" "No hay instalación, mostrando aceptación de terminos y condiciones" "I"
 
 	initInstalation
-	
+
 	executeInstaler "LISTA"
 exit 0;
 fi
