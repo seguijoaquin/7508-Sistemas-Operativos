@@ -4,6 +4,7 @@ use Getopt::Std;
 use strict;
 use Switch;
 use warnings;
+use Text::CSV;
 
 my %opts;
 getopts('ag', \%opts) or die mostrar_ayuda();
@@ -108,7 +109,18 @@ sub mostrar_ganadores_sorteo
 
 sub mostrar_resutado_general
 {
-	#TODO: Mostrar resultado general
+	my $csv = Text::CSV->new({ caracter => ',' });
+	my $file = "archivo sorteo";
+	open(my $data, '<', $file) or die "No se puede abrir el archivo '$file' $!\n";
+	while (my $line = <$data>) {
+	  chomp $line;
+	  if ($csv->parse($line)) {
+		  my @fields = $csv->fields();
+		  print "Nro. de Sorteo $fields[0], le correspondió al número de orden $fields[1]\n";
+	  } else {
+		  warn "Error en el formato de línea en: $line\n";
+	  }
+	}
 }
 
 sub error_lock
