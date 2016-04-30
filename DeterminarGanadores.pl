@@ -110,6 +110,7 @@ sub mostrar_ganadores_sorteo
 sub mostrar_resutado_general
 {
 	my $csv = Text::CSV->new({ caracter => ',' });
+	#TODO: poner nombre archivo correcto
 	my $file = "archivo sorteo";
 	open(my $data, '<', $file) or die "No se puede abrir el archivo '$file' $!\n";
 	while (my $line = <$data>) {
