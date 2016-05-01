@@ -12,6 +12,7 @@ NOKDIR="./Rechazados"
 CONCESIONARIOS="$MAEDIR/concesionarios.csv.xls"
 FECHAS_ADJUDICACION="$MAEDIR/FechasAdj.csv.xls"
 SLEEPTIME=35
+PROCESARENEJECUCION=false
 ciclo=0
 
 function hayArchivos()
@@ -145,7 +146,7 @@ function procesarNovedades
 			mensaje="Se rechazo el archivo $archivo, este no es un archivo de texto"
 		fi
 
-		# Guardo el suceso en la bitacora
+		# Muevo los archivos al directorio correspondiente y guardo el suceso en la bitacora
 		if ( ! $archivoAceptado )
 		then
 			MoverArchivos "$ARRIDIR/$archivo" "$NOKDIR/$archivo" "RecibirOfertas"
@@ -182,8 +183,14 @@ do
 
 	if hayArchivos $OKDIR
 	then
-		#TODO: Verificar que no este corriendo ProcesarOfertas y ejecutar si no lo esta.
-		./GrabarBitacora.sh "RecibirOfertas" "Invocar a ProcesarOfertas" "INFO"
+		if ! $PROCESARENEJECUCION
+		then
+			./GrabarBitacora.sh "RecibirOfertas" "ProcesarOfertas corriendo bajo el no.: <Process Id de ProcesarOfertas>" "INFO"
+			PROCESARENEJECUCION=true
+			./ProcesarOfertas.sh &
+		else
+			./GrabarBitacora.sh "RecibirOfertas" "Invocación de ProcesarOfertas pospuesta para el siguiente ciclo" "INFO"
+		fi
 	fi
 	sleep $SLEEPTIME
 done
