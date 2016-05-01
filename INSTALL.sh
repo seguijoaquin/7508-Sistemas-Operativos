@@ -100,7 +100,7 @@ function initInstalation(){
 		#touch $CONFIGFILETEMP
 	fi
 
-	echo "GRUPO=$BASEDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+	echo "GRUPO=$GRUPO=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
 	getDirectoryPath "Defina el directorio de instalación de los ejecutables ($BINDIR):" "$BINDIR"
 	BINDIR=$pathTemp
@@ -380,6 +380,17 @@ function executeInstaler(){
 
 	echo "Instalación CONCLUIDA"
 	log "Installer" "Instalación CONCLUIDA" "I"
+
+
+	#Copio todo al directorio de respaldo
+	mkdir -p $BACKUPDIR
+
+	for i in $(ls *.*)
+	 do
+		cp "$i" "$BACKUPDIR/$i"
+		#mv "$i" "$BACKUPDIR/$i"
+	done
+
 
 	#Elimino Archivos
 	#rm -rf ./Datos
