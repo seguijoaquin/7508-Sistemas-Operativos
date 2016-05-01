@@ -3,16 +3,16 @@
 source MoverArchivo.sh
 
 #Variables de entorno provisorias
-MAEDIR="."
-OKDIR="./Aceptados"
-PROCDIR="./Procesados"
+MAEDIR="../maestros"
+OKDIR="../aceptados"
+PROCDIR="../procesados"
 
 SUSCRIPTORES="$MAEDIR/temaK_padron.csv.xls"
 FECHAS_ADJUDICACION="$MAEDIR/FechasAdj.csv.xls"
 GRUPOS="$MAEDIR/grupos.csv.xls"
 ACEPTADOS="$PROCDIR/validas"
 RECHAZADOS="$PROCDIR/rechazadas"
-PROCESADOS="$PROCDIR/Procesados"
+PROCESADOS="$PROCDIR/procesados"
 
 # Creo los directorios si no existen
 mkdir -p $ACEPTADOS

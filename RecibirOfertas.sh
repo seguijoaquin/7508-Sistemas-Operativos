@@ -3,10 +3,10 @@
 source MoverArchivo.sh
 
 #Variables de entorno provisorias
-ARRIDIR="./Novedades"
-MAEDIR="."
-OKDIR="./Aceptados"
-NOKDIR="./Rechazados"
+ARRIDIR="../arribados"
+MAEDIR="../maestros"
+OKDIR="../aceptados"
+NOKDIR="../rechazados"
 
 
 CONCESIONARIOS="$MAEDIR/concesionarios.csv.xls"
