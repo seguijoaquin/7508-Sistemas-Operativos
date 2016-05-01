@@ -8,6 +8,7 @@ use Text::CSV;
 
 my %opts;
 my %padron;
+my %sorteo;
 my %ganadores_sorteo;
 my %ganadores_licitacion;
 getopts('ag', \%opts) or die mostrar_ayuda();
@@ -77,8 +78,8 @@ sub procesar
 
 sub ejecutar_proceso
 {
-	#TODO: Logica del proceso
 	ganadores_por_sorteo();
+	ganadores_por_licitacion();
 }
 
 sub ganadores_por_sorteo
@@ -150,6 +151,7 @@ sub ganadores_por_sorteo
 					 {
 						if($fields_sorteo[1] < $numero_menor)
 						{
+							@datos_ganador=(); 
 							$numero_menor = $fields_sorteo[1];
 							$datos_ganador.push($p); #Orden
 							$datos_ganador.push($fields_sorteo[1]); #Sorteo
@@ -169,7 +171,65 @@ sub ganadores_por_sorteo
 
 sub ganadores_por_licitacion
 {
-
+	my $csv_sorteo = Text::CSV->new({ caracter => ';' });
+	my $file_sorteo = "archivo sorteo";	#TODO: poner nombre archivo correcto
+	open(my $data_sorteo, '<', $file_sorteo) or die "No se puede abrir el archivo '$file_sorteo' $!\n";
+	
+	my $csv_validas = Text::CSV->new({ caracter => ';' });
+	my $file_validas= "archivo validas"; #TODO: poner nombre archivo correcto
+	open(my $data_validas, '<', $file_validas) or die "No se puede abrir el archivo '$file_validas' $!\n";
+	
+	my $mayor_oferta = 0;
+	my @datos_ganador; #Array con los datos del ganador
+	
+	#Cargo los datos del sorteo parad definir en caso de empate
+	while (my $line_sorteo = <$data_sorteo>) {
+	  chomp $line_sorteo;
+	  if ($csv_sorteo->parse($line_sorteo)) {
+		  my @fields_sorteo= $csv_sorteo->fields_sorteo();
+			$sorteo{$fields_sorteo[0]} = $fields_sorteo[1];
+		  }
+	  } else {
+		  warn "Error en el formato de línea en: $line_padron\n";
+	  }
+	}
+	
+	foreach my $g (@lista_grupos) {
+		@datos_ganador=(); 
+		
+		while (my $line_validas = <$data_validas>) {
+		  chomp $line_validas;
+		  if ($csv_validas->parse($line_validas)) {
+			  my @fields_validas = $csv_grupo->fields_validas();
+			  if($fields_validas[4] !=  $ganadores_sorteo{$g}[0]) #Comparo el ganador del sorteo para el grupo en proceso
+			  {
+				if($fields_validas[5] > $mayor_oferta)
+				{
+					@datos_ganador=(); 
+					$mayor_oferta = $fields_validas[5];
+					$datos_ganador.push($fields_validas[4]); #Orden
+					$datos_ganador.push($fields_validas[5]); #Importe
+					$datos_ganador.push($fields_validas[6]); #Nombre
+					$datos_ganador.push($sorteo{$fields_validas[6]}); #Sorteo
+				}
+				elseif($fields_validas[5] == $mayor_oferta) #En caso de empate, desempatar por sorteo
+				{
+						if($datos_ganador[4] < $sorteo{$fields_validas[6]}) #Si el numero de sorteo del actual en proceso es mayor al que ya existe, entonces lo cambio
+						{
+							@datos_ganador=(); 
+							$mayor_oferta = $fields_validas[5];
+							$datos_ganador.push($fields_validas[4]); #Orden
+							$datos_ganador.push($fields_validas[5]); #Importe
+							$datos_ganador.push($fields_validas[6]); #Nombre
+							$datos_ganador.push($sorteo{$fields_validas[6]}); #Sorteo
+						}
+				}
+			  }
+		  } else {
+			  warn "Error en el formato de línea en: $line_padron\n";
+		  }
+		}
+		$ganadores_licitacion{$g} = $datos_ganador;
 }
 
 sub analizar_grupos
@@ -199,7 +259,11 @@ sub mostrar_resultados_grupo
 
 sub mostrar_ganadores_licitacion
 {
-	#TODO: Mostrar ganadores licitacion
+	#TODO: poner el titulo
+	foreach my $g (keys %ganadores_licitacion) {	
+			print "Ganador por licitación del grupo $g: Numero de orden $ganadores_licitacion{$g}[0],  $ganadores_licitacion{$g}[2] con $ganadores_licitacion{$g}[1] (Nro de Sorteo  $ganadores_licitacion{$g}[3])\n";
+		}
+	}
 }
 
 sub mostrar_ganadores_sorteo
