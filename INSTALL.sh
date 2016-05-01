@@ -174,6 +174,10 @@ function initInstalation(){
 	getDirectoryPath "Defina el directorio de grabación los archivos rechazados ($NOKDIR):" "$NOKDIR"
 	NOKDIR=$pathTemp
 	echo "NOKDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+	
+	#Agrego directorio de Backup al archivo de configuracion
+	echo "BACKUPDIR=$BACKUPDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+
 }
 
 function getDirectoryPath(){
