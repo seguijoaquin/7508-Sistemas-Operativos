@@ -1,18 +1,23 @@
 #!/bin/bash
 #Instalador CIPAK - Grupo 7
 #*************************** Variables ***************************
-BASEDIR= "."#`pwd`
+BASEDIR= "."
+ACTUALDIR="./"
+
 LOGFILEINS="install.log"
 GRUPO="./GRUPO7"
-CONFDIR="$GRUPO/config"
-CONFIGFILE="$CONFDIR/CIPAK.cnf"
-CONFIGFILETEMP="$CONFDIR/CIPAK.temp"
+CONFDIRINSTALL="./conf"
+
+CONFDIR="$GRUPO/conf"
+CONFIGFILE="$GRUPO/conf/CIPAK.cnf"
+CONFIGFILETEMP="$CONFDIRINSTALL/CIPAK.temp"
+
 pathResult=""
-ACTUALDIR="./"
 BINDIR="$GRUPO/binarios"
 MAEDIR="$GRUPO/maestros"
 ARRIDIR="$GRUPO/arribados"
 #$GRUPO/datos #con los archivos de la catedra
+BACKUPDIR="$GRUPO/respaldo"
 OKDIR="$GRUPO/aceptados"
 PROCDIR="$GRUPO/procesados"
 INFODIR="$GRUPO/informes"
@@ -85,12 +90,14 @@ function initInstalation(){
 	#Usuario Acepto los terminos
 	log "Installer" "Usuario acepto ACUERDO DE LICENCIA DE SOFTWARE" "I"
 
-
+	echo "configuracion temporal"
 	#Si existe vuelvo a generar el archivo de configuracion temporal
 	if [ -a $CONFIGFILETEMP ]
 	then
+		log "Installer" "Genero archivo de configuracion temporal" "I"
+		echo "Genero archivo de configuracion temporal"
 		rm $CONFIGFILETEMP
-		touch $CONFIGFILETEMP
+		#touch $CONFIGFILETEMP
 	fi
 
 	echo "GRUPO=$BASEDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
@@ -342,11 +349,11 @@ function executeInstaler(){
 		chmod u+x "$BASEDIR$BINDIR/$i"
 	done
 
-
-	for i in $(ls $CONFDIR)
-	do
-		cp "$CONFDIR/$i" "$BASEDIR$GRUPO/conf/$i"
-	done
+	#Muevo la configuracion creada por el instalador.
+	#for i in $(ls $CONFDIRINSTALL)
+	#do
+	#	cp "$CONFDIRINSTALL/$i" "$BASEDIR$GRUPO/conf/$i"
+	#done
 
 	LOGCOMMAND="$BASEDIR$BINDIR/GrabarBitacora.sh"
 
@@ -362,11 +369,14 @@ function executeInstaler(){
 	echo "Actualizando la configuración del sistema"
 	log "Installer" "Actualizando la configuración del sistema" "I"
 
-	log "Installer" "Convirtiendo $GRUPO/conf/afinstall.temp  ->  $BASEDIR$GRUPO/conf/afinstall.conf" "I"
+	log "Installer" "Convirtiendo $BASEDIR$GRUPO/conf/  ->  $CONFIGFILE" "I"
 
-	cp "$BASEDIR$GRUPO/conf/afinstall.temp" "$BASEDIR$GRUPO/conf/afinstall.conf"
+	cp "$CONFIGFILETEMP" "$CONFIGFILE"
 
-	cp -r "$BASEDIR/Datos/MAE/." "$BASEDIR$MAEDIR/"
+	#copiando log de instalacion a bitacoras.
+	cp "$CONFDIRINSTALL/GraLog.log" "$BASEDIR$LOGDIR/Installer.log"
+
+	#cp -r "$BASEDIR/Datos/MAE/." "$BASEDIR$MAEDIR/"
 
 	echo "Instalación CONCLUIDA"
 	log "Installer" "Instalación CONCLUIDA" "I"
@@ -377,15 +387,13 @@ function executeInstaler(){
 	#rm *.sh
 	#rm *.pl
 	#rm *.md
-
-
 }
 
 
 #Si no existe la carpeta de configuracion la creo.
-if [ ! -d $CONFDIR ]
+if [ ! -d $CONFDIRINSTALL ]
 	then
-	mkdir -p $CONFDIR
+	mkdir -p $CONFDIRINSTALL
 fi
 
 #Otorgo permisos a los comando que voy a utilizar
@@ -394,8 +402,8 @@ chmod u+r+x $LOGCOMMAND
 #Inicio del instalador
 log "Installer" "Inicio de Ejecución de Installer"
 
-echo "Log de la instalación: $CONFDIR/$LOGFILEINS"
-log "Installer" "Log de la instalación: $CONFDIR/$LOGFILEINS"
+echo "Log de la instalación: $CONFDIRINSTALL/$LOGFILEINS"
+log "Installer" "Log de la instalación: $CONFDIRINSTALL/$LOGFILEINS"
 
 echo "Directorio predefinido de configuración: $GRUPO/conf"
 log "Installer" "Directorio predefinido de configuración: $GRUPO/conf"
@@ -680,3 +688,4 @@ else
 	executeInstaler "LISTA"
 exit 0;
 fi
+
