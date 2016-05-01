@@ -198,7 +198,7 @@ function getDirectoryPath(){
 			then
 				pathTemp=$GRUPO$pathTemp
 			else
-				echo 'Path invalido ingrese nuevamente'
+				echo 'Path invalido, ingrese nuevamente'
 			fi
 		fi
 	done
