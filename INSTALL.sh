@@ -174,6 +174,10 @@ function initInstalation(){
 	getDirectoryPath "Defina el directorio de grabación los archivos rechazados ($NOKDIR):" "$NOKDIR"
 	NOKDIR=$pathTemp
 	echo "NOKDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+	
+	#Agrego directorio de Backup al archivo de configuracion
+	echo "BACKUPDIR=$BACKUPDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+
 }
 
 function getDirectoryPath(){
@@ -437,13 +441,14 @@ then
 	LOGEXTTMP=$(grep '^LOGEXT' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
 	LOGSIZETMP=$(grep '^LOGSIZE' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
 	NOKDIRTMP=$(grep '^NOKDIR' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
+	BACKUPDIRTMP=$(grep '^BACKUPDIR' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
 
 	declare -a VAR_FALTANTES; #Array con los directorios que falta configurar
 	declare -a VAR_COMPLETO; #Array con los directorios que falta configurar
 
 	if [ -z $BASEDIRTMP ]
 	then
-		echo "GRUPO=$BASEDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+		echo "GRUPO=$GRUPO=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 	fi
 
 	if [ -z $BINDIRTMP ]
@@ -533,6 +538,8 @@ then
 		NOKDIR=$NOKDIRTMP
 		VAR_COMPLETO=( ${VAR_COMPLETO[*]} NOKDIR)
 	fi
+
+	
 
 	if [ ${#VAR_FALTANTES[@]} -eq 0 ] #No falta ninguna variable en el archivo temporal
 	then
@@ -688,6 +695,10 @@ then
 	done
 	fi
 
+	if [ -z $BACKUPDIRTMP ]
+	then
+		echo "BACKUPDIR=$BACKUPDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+	fi
 	executeInstaler "LISTA"
 
 else
