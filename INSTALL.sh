@@ -111,7 +111,7 @@ function initInstalation(){
 
 	echo "CONFDIR=$CONFDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 	
-	readNumber "Defina tiempo de espera entre ejecuciones de Procesar Ofertas SLEEPTIME ($SLEEPTIME)" "$SLEEPTIME"
+	readNumber "Defina tiempo de espera entre ejecuciones de Procesar Ofertas ($SLEEPTIME)" "$SLEEPTIME"
 	SLEEPTIME=$numberTemp
 	echo "SLEEPTIME=$SLEEPTIME=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
@@ -611,7 +611,7 @@ then
 	do
 		case $VARVALUE in
 			SLEEPTIME )
-				echo "tiempo de espera entre ejecuciones de Procesar Ofertas: $SLEEPTIME";;
+				echo "tiempo de espera entre ejecuciones de Procesar Ofertas";;
 			BINDIR )
 				echo "Directorio Ejecutables";;
 			MAEDIR )
@@ -656,7 +656,7 @@ then
 			SLEEPTIME )
 				readNumber "Defina tiempo de espera entre ejecuciones de Procesar Ofertas SLEEPTIME ($SLEEPTIME)" "$SLEEPTIME"
 				SLEEPTIME=$numberTemp
-				echo "SLEEPTIME=$SLEEPTIME=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+				echo "SLEEPTIME=$SLEEPTIME=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP;;
 			BINDIR )
 				getDirectoryPath "Defina el directorio de instalación de los ejecutables ($BINDIR):" "$BINDIR"
 				BINDIR=$pathTemp
