@@ -4,7 +4,7 @@ cantParam=$#
 hayFuncion=0
 
 function pause() {
-   read -p "$*"
+	read -p "$*"
 }
 
 #Chequeo ambiente
@@ -83,7 +83,8 @@ then
 
 			#Chequeo que exista la funcion en memoria
 			funcionEnProceso=$(echo ${funcionDetenerProceso##*/})
-			chequeo=$(ps -A | grep "$funcionEnProceso")
+			psOut=$(ps -eo pid,args) # correr separado para que ps no muestre a grep corriendo
+			chequeo=$(echo "$psOut" | grep "$funcionEnProceso")
 			if [ "$chequeo" == "" ]
 			then
 				if [ "$hayFuncion" -eq 1 ]
@@ -101,12 +102,14 @@ then
 
 			#Obtengo Id del proceso para matarlo
 			funcionEnProceso=$(echo ${funcionDetenerProceso##*/})
-			idProceso=$(ps -A | grep "$funcionEnProceso" | cut -d ' ' -f 1)
+			psOut=$(ps -eo pid,args) # correr separado para que ps no muestre a grep corriendo
+			idProceso=$(echo "$psOut" | grep "$funcionEnProceso" | cut -d ' ' -f 1)
 			numeroDeCampo=2
 
 			while [ "$idProceso" == "" ]
 			do
-				idProceso=$(ps -A | grep "$funcionEnProceso" | cut -d ' ' -f "$numeroDeCampo")
+				psOut=$(ps -eo pid,args) # correr separado para que ps no muestre a grep corriendo
+				idProceso=$(echo "$psOut" | grep "$funcionEnProceso" | cut -d ' ' -f "$numeroDeCampo")
 				let numeroDeCampo="$numeroDeCampo"+1
 			done
 

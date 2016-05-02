@@ -4,7 +4,7 @@ cantParam=$#
 hayFuncion=0
 
 function pause() {
-   read -p "$*"
+	read -p "$*"
 }
 
 #Chequeo ambiente
@@ -39,8 +39,8 @@ then
 			then
 
 				#Chequeo proceso que lo invoca
-        #Si no se especifica comando que lo invoca, se asume desde shell
-        #Y el log sera desde shell
+				#Si no se especifica comando que lo invoca, se asume desde shell
+				#Y el log sera desde shell
 				if [ "$1" == "-i" ]
 				then
 					procesoQueLoInvoca="$2"
@@ -100,8 +100,8 @@ then
 			fi
 
 			#Chequeo que no este corriendo el proceso
-			procesosCorriendo=$(ps -A -f)
-			chequeo=$(echo "$procesosCorriendo" | grep "$funcionLanzarProceso")
+			psOut=$(ps -eo pid,args) # correr separado para que ps no muestre a grep corriendo
+			chequeo=$(echo "$psOut" | grep "$funcionLanzarProceso")
 			if [ "$chequeo" != "" ]
 			then
 				#Muestro el error de ya esta corriendo

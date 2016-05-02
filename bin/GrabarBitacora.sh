@@ -16,7 +16,6 @@ if [[ -z "$LOGDIR" ]]; then
 	LOGDIR="./conf/"
 fi
 LOGEXT=".log"
-USER="<log in del usuario>"
 #fin variables temporales
 
 #Archivo temporal

@@ -11,7 +11,7 @@ DIRECTORIO_COLOR='\e[93m'
 ARCHIVO_COLOR='\e[93m'
 
 function pause() {
-   read -p "$*"
+	read -p "$*"
 }
 
 printError () {
@@ -410,17 +410,19 @@ arranqueRecibirOfertas () {
 	do
 		case $respuesta in
 
-			Si)	PROCESO=$( ps -A | grep "RecibirOfertas.sh" )
+			Si)	psOut=$(ps -eo pid,args) # correr separado para que ps no muestre a grep corriendo
+				PROCESO=$( echo "$psOut" | grep "RecibirOfertas.sh" )
 				if [ -n "$PROCESO" ]; then
 					echo "Ya existe un proceso RecibirOfertas corriendo"
 					return 0
 				fi
 
-				LanzarProceso.sh -i PrepararAmbiente
+				LanzarProceso.sh -i RecibirOfertas
 
 				SAVEIFS=$IFS
 				IFS=" "
-				RecibirOfertas_ID=$( ps -A | grep "RecibirOfertas" )
+				psOut=$(ps -eo pid,args) # correr separado para que ps no muestre a grep corriendo
+				RecibirOfertas_ID=$( echo "$psOut" | grep "RecibirOfertas" )
 				RecibirOfertas_ID=( $RecibirOfertas_ID )
 				RecibirOfertas_ID=${RecibirOfertas_ID[0]}
 
@@ -446,12 +448,23 @@ arranqueRecibirOfertas () {
 	done
 }
 
+# Chequea que el script corra de la forma '. PrepararAmbiente.sh'
+chequearSourced() {
+	if [[ $0 == $BASH_SOURCE ]]; then
+		printError "Este script debe ser llamado de la forma '. PrepararAmbiente.sh' para configurar las variables de entorno correctamente"
+		exit 1
+	fi
+}
+
 ###############################################################################
 #$1: Contiene el archivo de configuracion con su path ej:"/home/.../CIPAK.conf"
 
 #-------------------- CODIGO PRINCIPAL ----------------------------------------
 
 clear
+
+# A partir de este punto usaremos return en lugar de exit ya que estamos 'sourceados'
+chequearSourced
 
 # Funcion que devuelve 0 si no fue inicializado u otro numero si lo fue
 ambienteInicializado
@@ -466,8 +479,9 @@ if [ "$?" =  1 ]; then
 		echo -e "CONF es la ruta al archivo de configuración, que puede ser generado por INSTALL.sh."
 		echo -e "Por ejemplo \"/home/usuario/CIPAK/CIPAK.cnf\" \n"
 		pause 'Press [Enter] key to continue...'
-		exit 1
+		return 1
 	fi
+
 
 	CONFIG_FILE=$1
 
@@ -480,19 +494,19 @@ if [ "$?" =  1 ]; then
 	if [ "$VALOR_RETORNO" = 1 ]; then
 		repararInstalacion "$CONFIG_FILE"
 		pause 'Press [Enter] key to continue...'
-		exit 1
+		return 1
 
 	elif [ "$VALOR_RETORNO" = 2 ]; then
 		#Archivo de configuracion invalido
 		echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
 		pause 'Press [Enter] key to continue...'
-		exit 1
+		return 1
 	fi
 
 	seteoDePermisos "$CONFIG_FILE"
 
 	if [ "$?" = 1 ]; then
-		exit 1
+		return 1
 	fi
 
 	levantarVariablesDesdeElArchivo "$CONFIG_FILE"
