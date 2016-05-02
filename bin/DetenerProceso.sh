@@ -91,12 +91,12 @@ then
 				then
 
 					comandoGrabarBitacora=$(echo ${procesoQueLoInvoca%.sh})
-					"$logDetenerProceso" "$comandoGrabarBitacora" "No se puede detener: $procesoAEjecutar porque no esta en ejecucion" "ERR"
+					"$logDetenerProceso" "$procesoQueLoInvoca" "No se puede detener: $procesoAEjecutar porque no esta en ejecucion" "ERR"
 				else
 					echo "Detener: No se puede detener $procesoAEjecutar porque no esta en ejecucion"
 				fi
 				pause 'Press [Enter] key to continue...'
-				exit 1
+				return 1
 
 			fi
 
@@ -126,13 +126,13 @@ then
 
 					if [ $resultadoKill -eq 0 ]
 					then
-						"$logDetenerProceso" "$comandoGrabarBitacora" "$procesoAEjecutar se detuvo correctamente"
+						"$logDetenerProceso" "$procesoQueLoInvoca" "$procesoAEjecutar se detuvo correctamente"
 						pause 'Press [Enter] key to continue...'
-						exit 0
+						return 0
 					else
-						"$logDetenerProceso" "$comandoGrabarBitacora" "$procesoAEjecutar no se pudo detener" "ERR"
+						"$logDetenerProceso" "$procesoQueLoInvoca" "$procesoAEjecutar no se pudo detener" "ERR"
 						pause 'Press [Enter] key to continue...'
-						exit 1
+						return 1
 					fi
 
 				else
@@ -141,11 +141,11 @@ then
 					then
 						echo "Detener: "$procesoAEjecutar" se detuvo correctamente"
 						pause 'Press [Enter] key to continue...'
-						exit 0
+						return 0
 					else
 						echo "Detener: "$procesoAEjecutar" no se pudo detener"
 						pause 'Press [Enter] key to continue...'
-						exit 1
+						return 1
 					fi
 
 				fi
@@ -154,7 +154,7 @@ then
 				if [ "$hayFuncion" -eq 1 ]
 				then
 					comandoGrabarBitacora=$(echo ${procesoQueLoInvoca%.sh})
-					"$logDetenerProceso" "$comandoGrabarBitacora" "No existe PID de $procesoAEjecutar" "ERR"
+					"$logDetenerProceso" "$procesoQueLoInvoca" "No existe PID de $procesoAEjecutar" "ERR"
 				else
 					echo "Detener: No existe PID de "$procesoAEjecutar"" "ERR"
 				fi
@@ -163,17 +163,17 @@ then
 		else
 			echo "Detener: no existe "$logDetenerProceso""
 			pause 'Press [Enter] key to continue...'
-			exit 1
+			return 1
 		fi
 
 	else
 		echo "Detener: cantidad de parametros incorrecta"
 		pause 'Press [Enter] key to continue...'
-		exit 1
+		return 1
 	fi
 
 else
 	echo "Detener: No se puede iniciar si no esta inicializado el ambiente"
 	pause 'Press [Enter] key to continue...'
-	exit 1
+	return 1
 fi

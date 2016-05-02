@@ -417,7 +417,7 @@ arranqueRecibirOfertas () {
 					return 0
 				fi
 
-				LanzarProceso.sh -i RecibirOfertas
+				LanzarProceso.sh -i PrepararAmbiente
 
 				SAVEIFS=$IFS
 				IFS=" "
@@ -452,6 +452,7 @@ arranqueRecibirOfertas () {
 chequearSourced() {
 	if [[ $0 == $BASH_SOURCE ]]; then
 		printError "Este script debe ser llamado de la forma '. PrepararAmbiente.sh' para configurar las variables de entorno correctamente"
+		pause 'Press [Enter] key to continue...'
 		exit 1
 	fi
 }
