@@ -74,8 +74,10 @@ comprobarInstalacion () {
 	INFODIR_INST=true
 	LOGDIR_INST=true
 	ARRIDIR_INST=true
+	BACKUPDIR_INST=true
 
 	LOGSIZE_INST=true
+	LOGEXT_INST=true
 	SLEEPTIME_INST=true
 
 	#GRUPO
@@ -141,23 +143,94 @@ comprobarInstalacion () {
 	if $ARRIDIR_INST; then comprobarVariable "$VALOR" ARRIDIR; if [ "$?" = 1 ]; then ARRIDIR_INST=false; fi; fi
 	if $ARRIDIR_INST; then comprobarDirectorio "$VALOR"; if [ "$?" = 1 ]; then ARRIDIR_INST=false; fi; fi
 
+	#BACKUPDIR
+	VALOR=$( grep "^BACKUPDIR.*$" "$1" | sed "s-\(^ARRIDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+	if $BACKUPDIR_INST; then comprobarVariable "$VALOR" BACKUPDIR; if [ "$?" = 1 ]; then BACKUPDIR_INST=false; fi; fi
+	if $BACKUPDIR_INST; then comprobarDirectorio "$VALOR"; if [ "$?" = 1 ]; then BACKUPDIR_INST=false; fi; fi
+
 
 	#Variables
 
 	#LOGSIZE
 	VALOR=$( grep "^LOGSIZE.*$" "$1" | sed "s-\(^LOGSIZE=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
-	if $LOGSIZE_INST; then comprobarVariable "$VALOR" LOGSIZE; if [ "$?" = 1 ]; then LOGDSIZE_INST=false; fi; fi
+	if $LOGSIZE_INST; then comprobarVariable "$VALOR" LOGSIZE; if [ "$?" = 1 ]; then LOGSIZE_INST=false; fi; fi
+
+	#LOGEXT
+	VALOR=$( grep "^LOGEXT.*$" "$1" | sed "s-\(^LOGEXT=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+	if $LOGEXT_INST; then comprobarVariable "$VALOR" LOGEXT; if [ "$?" = 1 ]; then LOGEXT_INST=false; fi; fi
 
 	#SLEEPTIME
 	VALOR=$( grep "^SLEEPTIME.*$" "$1" | sed "s-\(^SLEEPTIME=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
 	if $SLEEPTIME_INST; then comprobarVariable "$VALOR" SLEEPTIME; if [ "$?" = 1 ]; then SLEEPTIME_INST=false; fi; fi
 
-	if $GRUPO_INST && $CONFDIR_INST && $BINDIR_INST && $MAEDIR_INST && $OKDIR_INST && $NOKDIR_INST && $PROCDIR_INST && $INFODIR_INST && $LOGDIR_INST && $ARRIDIR_INST && $LOGSIZE_INST && $SLEEPTIME_INST; then
+	if $GRUPO_INST && $CONFDIR_INST && $BINDIR_INST && $MAEDIR_INST && $OKDIR_INST && $NOKDIR_INST && $PROCDIR_INST && $INFODIR_INST && $LOGDIR_INST && $ARRIDIR_INST && $LOGSIZE_INST $LOGEXT_INST && $SLEEPTIME_INST; then
 		return 0
 	 fi
 
 	return 1
 
+}
+
+#Recibe como primer parametro la ruta del archivo CIPAK.cnf
+#Segundo parametro es la ruta de scripts de respaldo
+copiarArchivos () {
+	if ( "$BACKUPDIR_INST" ); then
+		BACKUPDIR=$( grep "^BACKUPDIR.*$" "$1" | sed "s-\(^BACKUPDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+		export BACKUPDIR
+	else
+		return 1
+	fi
+
+	if ( "$BINDIR_INST" ); then
+		if ( "$GRUPO_INST"); then
+			GRUPO=$( grep "^GRUPO.*$" "$1" | sed "s-\(^GRUPO=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+			export GRUPO
+			BINDIR=$( grep "^BINDIR.*$" "$1" | sed "s-\(^BINDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+			export BINDIR
+			#TODO: Copiar desde backupdir a bindir
+			for i in $(ls "$BINDIR"/*.sh)
+			 do
+				cp "$GRUPO$BACKUPDIR/$i" "$GRUPO$BINDIR/$i"
+			done
+		fi
+	else
+		return 1
+	fi
+	return 0
+}
+
+# En $1 recibe la ruta del archivo de configuracion CIPAK.cfg
+repararInstalacion () {
+	printError "La instalacion no fue realizada correctamente"
+	echo "Desea reparar la instalacion? (1 o 2)"
+
+	select respuesta in Si No
+	do
+		case $respuesta in
+
+			Si)
+				if (! "$BACKUPDIR_INST" ) then
+					printError "No se puede reparar la instalacion. Faltan archivos de respaldo"
+					echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
+					return 1
+				fi
+
+				copiarArchivos "$1"
+
+				if [[ "$?" = 1 ]]; then
+					printError "No se pudieron copiar algunos archivos"
+					echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
+					return 1
+				fi
+				return 0 ;;
+
+			No)	printError "El ambiente no pudo iniciarse correctamente"
+				echo "La instalacion no ha sido reparada"
+				return 1 ;;
+
+			*) echo "La respuesta solicitada no es valida por favor ingrese nuevamente: Recuerde que las opciones son 1 o 2 respectivamente"
+		esac
+	done
 }
 
 #$1: Archivo al cual le quiero cambiar los permisos
@@ -198,6 +271,10 @@ seteoDePermisos () {
 	VALOR=$( grep "^OKDIR.*$" "$1" | sed "s-\(^OKDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
 	setearPermisosDeUnDirectorio "$VALOR" "+r"
 
+	#BACKUPDIR
+	VALOR=$( grep "^BACKUPDIR.*$" "$1" | sed "s-\(^BACKUPDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+	setearPermisosDeUnDirectorio "$VALOR" "+r"
+
 	#NOKDIR
 	VALOR=$( grep "^NOKDIR.*$" "$1" | sed "s-\(^NOKDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
 	setearPermisosDeUnDirectorio "$VALOR" "+r"
@@ -235,6 +312,10 @@ levantarVariablesDesdeElArchivo () {
 	#BINDIR
 	BINDIR=$( grep "^BINDIR.*$" "$1" | sed "s-\(^BINDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
 	export BINDIR
+
+	#BACKUPDIR
+	BACKUPDIR=$( grep "^BACKUPDIR.*$" "$1" | sed "s-\(^BACKUPDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+	export BACKUPDIR
 
 	#PATH
 	PATH="$PATH:$BINDIR"
@@ -305,6 +386,7 @@ muestraYlogueoIndividual () {
 mostrarYloguearVariables () {
 	muestraYlogueoIndividual "$CONFDIR" "Directorio de Configuracion:" "CONFDIR"
 	muestraYlogueoIndividual "$BINDIR" "Directorio de Ejecutables:" "BINDIR"
+	muestraYlogueoIndividual "$BACKUPDIR" "Directorio de backup:" "BACKUPDIR"
 	muestraYlogueoIndividual "$MAEDIR" "Directorio de Maestros y Tablas:" "MAEDIR"
 	muestraYlogueoIndividual "$ARRIDIR" "Directorio de recepcion de archivos de novedades:" "ARRIDIR"
 	muestraYlogueoIndividual "$OKDIR" "Directorio de Archivos aceptados:" "OKDIR"
@@ -390,11 +472,12 @@ if [ "$?" =  1 ]; then
 	VALOR_RETORNO="$?"
 
 	if [ "$VALOR_RETORNO" = 1 ]; then
-		printError "La instalacion no fue realizada correctamente"
-		echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
+		repararInstalacion "$CONFIG_FILE"
 		return 1
 
 	elif [ "$VALOR_RETORNO" = 2 ]; then
+		#Archivo de configuracion invalido
+		echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
 		return 1
 	fi
 
