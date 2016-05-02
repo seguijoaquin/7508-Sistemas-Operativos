@@ -110,6 +110,9 @@ function initInstalation(){
 	echo "GRUPO=$GRUPO=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
 	echo "CONFDIR=$CONFDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+	
+	readNumber "Defina tiempo de espera entre ejecuciones de Procesar Ofertas SLEEPTIME ($SLEEPTIME)" "$SLEEPTIME"
+	SLEEPTIME=$numberTemp
 	echo "SLEEPTIME=$SLEEPTIME=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
 	getDirectoryPath "Defina el directorio de instalación de los ejecutables ($BINDIR):" "$BINDIR"
@@ -474,7 +477,7 @@ then
 
 	if [ -z $SLEEPTIMETMP ]
 	then
-		echo "SLEEPTIME=$SLEEPTIME=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+		VAR_FALTANTES=( ${VAR_FALTANTES[*]} SLEEPTIME)
 	fi
 
 	if [ -z $BINDIRTMP ]
@@ -575,6 +578,8 @@ then
 
 	for VARVALUE in "${VAR_COMPLETO[@]}"; do
 		case $VARVALUE in
+			SLEEPTIME )
+				echo "tiempo de espera entre ejecuciones de Procesar Ofertas: $SLEEPTIME";;
 			BINDIR )
 				echo "Directorio Ejecutables:   $BINDIR";;
 			MAEDIR )
@@ -605,6 +610,8 @@ then
 	for VARVALUE in "${VAR_FALTANTES[@]}"
 	do
 		case $VARVALUE in
+			SLEEPTIME )
+				echo "tiempo de espera entre ejecuciones de Procesar Ofertas: $SLEEPTIME";;
 			BINDIR )
 				echo "Directorio Ejecutables";;
 			MAEDIR )
@@ -646,6 +653,10 @@ then
 
 	for VARVALUE in "${VAR_FALTANTES[@]}"; do
 		case $VARVALUE in
+			SLEEPTIME )
+				readNumber "Defina tiempo de espera entre ejecuciones de Procesar Ofertas SLEEPTIME ($SLEEPTIME)" "$SLEEPTIME"
+				SLEEPTIME=$numberTemp
+				echo "SLEEPTIME=$SLEEPTIME=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 			BINDIR )
 				getDirectoryPath "Defina el directorio de instalación de los ejecutables ($BINDIR):" "$BINDIR"
 				BINDIR=$pathTemp
