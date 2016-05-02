@@ -3,6 +3,10 @@
 cantParam=$#
 hayFuncion=0
 
+function pause() {
+   read -p "$*"
+}
+
 #Chequeo ambiente
 if [ "$BINDIR" != "" ]
 then
@@ -90,7 +94,7 @@ then
 				else
 					echo "Detener: No se puede detener $procesoAEjecutar porque no esta en ejecucion"
 				fi
-
+				pause 'Press [Enter] key to continue...'
 				exit 1
 
 			fi
@@ -120,9 +124,11 @@ then
 					if [ $resultadoKill -eq 0 ]
 					then
 						"$logDetenerProceso" "$comandoGrabarBitacora" "$procesoAEjecutar se detuvo correctamente"
+						pause 'Press [Enter] key to continue...'
 						exit 0
 					else
 						"$logDetenerProceso" "$comandoGrabarBitacora" "$procesoAEjecutar no se pudo detener" "ERR"
+						pause 'Press [Enter] key to continue...'
 						exit 1
 					fi
 
@@ -131,9 +137,11 @@ then
 					if [ $resultadoKill -eq 0 ]
 					then
 						echo "Detener: "$procesoAEjecutar" se detuvo correctamente"
+						pause 'Press [Enter] key to continue...'
 						exit 0
 					else
 						echo "Detener: "$procesoAEjecutar" no se pudo detener"
+						pause 'Press [Enter] key to continue...'
 						exit 1
 					fi
 
@@ -151,15 +159,18 @@ then
 
 		else
 			echo "Detener: no existe "$logDetenerProceso""
+			pause 'Press [Enter] key to continue...'
 			exit 1
 		fi
 
 	else
 		echo "Detener: cantidad de parametros incorrecta"
+		pause 'Press [Enter] key to continue...'
 		exit 1
 	fi
 
 else
 	echo "Detener: No se puede iniciar si no esta inicializado el ambiente"
+	pause 'Press [Enter] key to continue...'
 	exit 1
 fi

@@ -31,6 +31,10 @@ VERSIONPERL=5
 
 SLEEPTIME=1
 #*************************** Funciones ***************************
+function pause() {
+   read -p "$*"
+}
+
 function log() {
 	command=$1
 	message=$2
@@ -59,6 +63,7 @@ function initInstalation(){
 		log  "Installer" "Para ejecutar el sistema CIPAK es necesario contar con Perl $VERSIONPERL o superior." "E"
 		log  "Installer"  "Efectúe su instalación e inténtelo nuevamente." "E"
 		log  "Installer"  "Proceso de Instalación Cancelado" "E"
+		pause 'Press [Enter] key to continue...'
 		exit 3;
 	else
 		echo ""
@@ -85,6 +90,7 @@ function initInstalation(){
 	if [ $optSelect = "no" ]
 	then
 		log "Installer" "Usuario NO acepto ACUERDO DE LICENCIA DE SOFTWARE"
+		pause 'Press [Enter] key to continue...'
 		exit 2
 	fi
 
@@ -291,6 +297,7 @@ function executeInstaler(){
 	then
 		clear
 		log "Installer" "Usuario No Quiere realizar la instalacion"
+		pause 'Press [Enter] key to continue...'
 		exit 4
 	fi
 
@@ -306,6 +313,7 @@ function executeInstaler(){
 		if [ $deletDirOpt = "no" ]
 		then
 			log "Installer" "El usuario no quiere eliminar el directorio $GRUPO existente" "I"
+			pause 'Press [Enter] key to continue...'
 			exit 5
 		else
 			log "Installer" "Eliminando contenido de directorio $GRUPO" "I"
@@ -632,6 +640,7 @@ then
 		if [ $optSelect = "no" ]
 	then
 		log "Installer" "Usuario no quiere continuar con la instalación" "I"
+		pause 'Press [Enter] key to continue...'
 		exit 6
 	fi
 
@@ -726,5 +735,6 @@ else
 	initInstalation
 
 	executeInstaler "LISTA"
+pause 'Press [Enter] key to continue...'
 exit 0;
 fi

@@ -10,6 +10,10 @@ NC='\033[0m' #no color
 DIRECTORIO_COLOR='\e[93m'
 ARCHIVO_COLOR='\e[93m'
 
+function pause() {
+   read -p "$*"
+}
+
 printError () {
 	echo -e "${ERROR_COLOR}ERROR: $1 ${NC}"
 }
@@ -461,6 +465,7 @@ if [ "$?" =  1 ]; then
 		echo -e "Uso: PrepararAmbiente.sh CONF \n"
 		echo -e "CONF es la ruta al archivo de configuración, que puede ser generado por INSTALL.sh."
 		echo -e "Por ejemplo \"/home/usuario/CIPAK/CIPAK.cnf\" \n"
+		pause 'Press [Enter] key to continue...'
 		exit 1
 	fi
 
@@ -474,11 +479,13 @@ if [ "$?" =  1 ]; then
 
 	if [ "$VALOR_RETORNO" = 1 ]; then
 		repararInstalacion "$CONFIG_FILE"
+		pause 'Press [Enter] key to continue...'
 		exit 1
 
 	elif [ "$VALOR_RETORNO" = 2 ]; then
 		#Archivo de configuracion invalido
 		echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
+		pause 'Press [Enter] key to continue...'
 		exit 1
 	fi
 
@@ -497,6 +504,8 @@ if [ "$?" =  1 ]; then
 
 	AMBIENTE_INICIALIZADO=true
 
+	pause 'Press [Enter] key to continue...'
+
 else # -------------------------------------------
 
 	# Ambiente inicializado
@@ -507,5 +516,7 @@ else # -------------------------------------------
 
 	# Log del mensaje y sus respectivos datos.
 	GrabarBitacora.sh "PrepararAmbiente" "$MSJ" "INFO"
+
+	pause 'Press [Enter] key to continue...'
 
 fi

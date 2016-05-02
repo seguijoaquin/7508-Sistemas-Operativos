@@ -3,6 +3,10 @@
 cantParam=$#
 hayFuncion=0
 
+function pause() {
+   read -p "$*"
+}
+
 #Chequeo ambiente
 if [ "$BINDIR" != "" ]
 then
@@ -88,6 +92,7 @@ then
 					else
 						echo "LanzarProceso: No se puede lanzar "$procesoAEjecutar" porque no existe"
 					fi
+					pause 'Press [Enter] key to continue...'
 					exit 1
 
 				fi
@@ -107,7 +112,7 @@ then
 				else
 					echo "LanzarProceso: No se puede lanzar "$procesoAEjecutar" porque ya esta en ejecucion"
 				fi
-
+				pause 'Press [Enter] key to continue...'
 				exit 1
 
 			else
@@ -128,9 +133,11 @@ then
 						if [ $resultadoLanzarProceso -eq 0 ]
 						then
 							"$logLanzarProceso" "$procesoQueLoInvoca" "$procesoAEjecutar se inicio correctamente" "INFO"
+							pause 'Press [Enter] key to continue...'
 							exit 0
 						else
 							"$logLanzarProceso" "$procesoQueLoInvoca" "$procesoAEjecutar no se pudo iniciar" "ERR"
+							pause 'Press [Enter] key to continue...'
 							exit 1
 						fi
 
@@ -139,9 +146,11 @@ then
 						if [ $resultadoLanzarProceso -eq 0 ]
 						then
 							echo "LanzarProceso: "$procesoAEjecutar" se inicio correctamente"
+							pause 'Press [Enter] key to continue...'
 							exit 0
 						else
 							echo "LanzarProceso: "$procesoAEjecutar" no se pudo iniciar"
+							pause 'Press [Enter] key to continue...'
 							exit 1
 						fi
 
@@ -155,6 +164,7 @@ then
 
 		else
 			echo "LanzarProceso: cantidad de parametros incorrecta"
+			pause 'Press [Enter] key to continue...'
 			exit 1
 		fi
 
@@ -164,5 +174,6 @@ then
 
 else
 	echo "LanzarProceso: No se puede iniciar si no esta inicializado el ambiente"
+	pause 'Press [Enter] key to continue...'
 	exit 1
 fi
