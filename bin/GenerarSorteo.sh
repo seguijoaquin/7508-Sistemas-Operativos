@@ -7,10 +7,10 @@ cont=1
 archivos=()
 
 #Variables de entorno temporales hasta que haya script de seteo de variables de entorno
-MAEDIR="MaestrosyTablas_TemaK"
-PROCDIR="procesados"
+#MAEDIR="MaestrosyTablas_TemaK"
+#PROCDIR="procesados"
 
-fechas_adj="$MAEDIR/FechasAdj.csv.xls" # TODO chequear con los docentes ya que el enunciado dice "fechas_adj.csv"
+fechas_adj="$MAEDIR/FechasAdj.mae" # TODO chequear con los docentes ya que el enunciado dice "fechas_adj.csv"
 dir_sorteos="$PROCDIR/sorteos/"
 
 #Genero el directorio de sorteos en caso de no existir

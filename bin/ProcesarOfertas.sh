@@ -3,13 +3,13 @@
 source MoverArchivo.sh
 
 #Variables de entorno provisorias
-MAEDIR="../maestros"
-OKDIR="../aceptados"
-PROCDIR="../procesados"
+#MAEDIR="../maestros"
+#OKDIR="../aceptados"
+#PROCDIR="../procesados"
 
-SUSCRIPTORES="$MAEDIR/temaK_padron.csv.xls"
-FECHAS_ADJUDICACION="$MAEDIR/FechasAdj.csv.xls"
-GRUPOS="$MAEDIR/grupos.csv.xls"
+SUSCRIPTORES="$MAEDIR/temaK_padron.mae"
+FECHAS_ADJUDICACION="$MAEDIR/FechasAdj.mae"
+GRUPOS="$MAEDIR/grupos.mae"
 ACEPTADOS="$PROCDIR/validas"
 RECHAZADOS="$PROCDIR/rechazadas"
 PROCESADOS="$PROCDIR/procesados"
@@ -88,7 +88,7 @@ function importeValido()
 
 	montoMinimo=`echo - | awk "{print $cuotaPura * $cantidadCuotasLicitacion}"`
 	montoMaximo=`echo - | awk "{print $cuotaPura * $cantidadCuotasPendientes}"`
-	if [[ `echo - | awk "{print $montoMinimo<=$ofertaSuscriptor}"` = 1 ]] 
+	if [[ `echo - | awk "{print $montoMinimo<=$ofertaSuscriptor}"` = 1 ]]
 	then
 		if [[ `echo - | awk "{print $ofertaSuscriptor<=$montoMaximo}"` = 1 ]]
 		then

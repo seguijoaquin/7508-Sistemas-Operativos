@@ -3,15 +3,15 @@
 source MoverArchivo.sh
 
 #Variables de entorno provisorias
-ARRIDIR="../arribados"
-MAEDIR="../maestros"
-OKDIR="../aceptados"
-NOKDIR="../rechazados"
+#ARRIDIR="../arribados"
+#MAEDIR="../maestros"
+#OKDIR="../aceptados"
+#NOKDIR="../rechazados"
 
 
-CONCESIONARIOS="$MAEDIR/concesionarios.csv.xls"
-FECHAS_ADJUDICACION="$MAEDIR/FechasAdj.csv.xls"
-SLEEPTIME=35
+CONCESIONARIOS="$MAEDIR/concesionarios.mae"
+FECHAS_ADJUDICACION="$MAEDIR/FechasAdj.mae"
+SLEEPTIME=$SLEEPTIME
 PROCESARENEJECUCION=false
 ciclo=0
 
@@ -194,4 +194,3 @@ do
 	fi
 	sleep $SLEEPTIME
 done
-
