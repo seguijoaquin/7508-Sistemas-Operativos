@@ -185,20 +185,14 @@ copiarArchivos () {
 		return 1
 	fi
 
-	if ( "$BINDIR_INST" ); then
-		if ( "$GRUPO_INST"); then
-			GRUPO=$( grep "^GRUPO.*$" "$1" | sed "s-\(^GRUPO=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
-			export GRUPO
-			BINDIR=$( grep "^BINDIR.*$" "$1" | sed "s-\(^BINDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
-			export BINDIR
-			#TODO: Copiar desde backupdir a bindir
-			for i in $(ls "$BINDIR"/*.sh)
-			 do
-				cp "$GRUPO$BACKUPDIR/$i" "$GRUPO$BINDIR/$i"
-			done
-		fi
-	else
-		return 1
+	if ( "$GRUPO_INST" ); then
+		GRUPO=$( grep "^GRUPO.*$" "$1" | sed "s-\(^GRUPO=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+		BINDIR=$( grep "^BINDIR.*$" "$1" | sed "s-\(^BINDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+		#TODO: Copiar desde backupdir a bindir
+		for i in $(ls "$BACKUPDIR")
+		 do
+			cp "$BACKUPDIR/$i" "$BINDIR/$i"
+		done
 	fi
 	return 0
 }
@@ -216,7 +210,8 @@ repararInstalacion () {
 				if (! "$BACKUPDIR_INST" ) then
 					printError "No se puede reparar la instalacion. Faltan archivos de respaldo"
 					echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
-					return 1
+					pause 'Press [Enter] key to continue...'
+					exit 1
 				fi
 
 				copiarArchivos "$1"
@@ -224,13 +219,16 @@ repararInstalacion () {
 				if [[ "$?" = 1 ]]; then
 					printError "No se pudieron copiar algunos archivos"
 					echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
-					return 1
+					pause 'Press [Enter] key to continue...'
+					exit 1
 				fi
+
 				return 0 ;;
 
 			No)	printError "El ambiente no pudo iniciarse correctamente"
 				echo "La instalacion no ha sido reparada"
-				return 1 ;;
+				pause 'Press [Enter] key to continue...'
+				exit 1 ;;
 
 			*) echo "La respuesta solicitada no es valida por favor ingrese nuevamente: Recuerde que las opciones son 1 o 2 respectivamente"
 		esac
@@ -494,11 +492,10 @@ if [ "$?" =  1 ]; then
 
 	if [ "$VALOR_RETORNO" = 1 ]; then
 		repararInstalacion "$CONFIG_FILE"
-		pause 'Press [Enter] key to continue...'
-		return 1
 
 	elif [ "$VALOR_RETORNO" = 2 ]; then
 		#Archivo de configuracion invalido
+		printError "Archivo de configuracion invalido"
 		echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
 		pause 'Press [Enter] key to continue...'
 		return 1
