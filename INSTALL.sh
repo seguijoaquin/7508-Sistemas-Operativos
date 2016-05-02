@@ -386,7 +386,7 @@ function executeInstaler(){
 	cp "$CONFIGFILETEMP" "$CONFIGFILE"
 
 	#copiando log de instalacion a bitacoras.
-	cp "$CONFDIRINSTALL/GraLog.log" "$LOGDIR/Installer.log"
+	cp "$CONFDIRINSTALL/Installer.log" "$LOGDIR/Installer.log"
 
 	echo "Instalación CONCLUIDA"
 	log "Installer" "Instalación CONCLUIDA" "I"
@@ -404,7 +404,7 @@ function executeInstaler(){
 
 	#Elimino Archivos
 	#rm -rf ./Datos
-	#rm -rf $CONFDIR
+	rm -rf $CONFDIRINSTALL
 	#rm *.sh
 	#rm *.pl
 	#rm *.md

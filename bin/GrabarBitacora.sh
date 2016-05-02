@@ -39,7 +39,7 @@ PMSG=$2  # Mensaje
 PTYPE=$3 # Tipo de mensaje
 
 #Directorio Log para instalador
-LOGFILEINS="GraLog.log"
+LOGFILEINS="Installer.log"
 LOGINS="./conf/$LOGFILEINS"
 
 #Directorio Log para comandos
