@@ -2,7 +2,7 @@
 
 # TODO permitir dos parámetros; el tercero es opcional
 #Verifico que tenga la cantidad de parametros necesarios
-if [ $# -ne 3 ] 
+if [ $# -ne 3 ]
 then
 	echo "Cantidad de parametros invalidos"
 	exit 1
@@ -12,7 +12,9 @@ fi
 #El directorio de log para el resto de los comandos es $LOGDIR
 
 #Variables de entorno temporales hasta que haya script de seteo de variables de entorno
-LOGDIR="./conf/"
+if [[ -z "$LOGDIR" ]]; then
+	LOGDIR="./conf/"
+fi
 LOGEXT=".log"
 USER="<log in del usuario>"
 #fin variables temporales
@@ -20,13 +22,13 @@ USER="<log in del usuario>"
 #Archivo temporal
 LOGFILETEMP="$LOGDIR/temp$LOGEXT"
 
-#Cantidad de lineas 
+#Cantidad de lineas
 LOGLINE=50
 
 #Tamaño del archivo de log
 if [ -z $LOGSIZE ] #Si es para el instalador, se toma 400kb por defecto, si es para los archivos se toma de la configuración
 then
-	LOGMAX=409600	
+	LOGMAX=409600
 else
 	LOGMAX=$(echo "scale=0 ; $LOGSIZE*1024" | bc -l)
 fi
@@ -41,7 +43,7 @@ LOGFILEINS="GraLog.log"
 LOGINS="./conf/$LOGFILEINS"
 
 #Directorio Log para comandos
-LOGCMD="$LOGDIR/$PCMD$LOGEXT"  
+LOGCMD="$LOGDIR/$PCMD$LOGEXT"
 
 #Tipos de LOG
 INFO="INFORMACION"
@@ -49,7 +51,7 @@ WAR="WARNING"
 ERR="ERROR"
 
 #Selecciono el archivo donde se va a realizar el log
-if [ $PCMD == "Installer" ] 
+if [ $PCMD == "Installer" ]
 then
 	LOGFILE=$LOGINS
 else
@@ -74,7 +76,7 @@ case $PTYPE in
 		TYPE="-$WAR";;
 	"ERR" )
 		TYPE="-$ERR";;
-	
+
 	* )
 		TYPE="-$INFO";;  #INFORMACION por defecto
 esac
@@ -85,17 +87,17 @@ DATENOW=$(date +'%d-%m-%Y %H:%M:%S')
 #Tamaño del log
 LOGSIZE=$(stat -c%s "$LOGFILE")
 
-if [ $LOGSIZE -gt $LOGMAX ] 
+if [ $LOGSIZE -gt $LOGMAX ]
 then
 	LINESIZE=`wc -l $LOGFILE | cut -d ' ' -f 1`
 	ENDPOS=`expr $LINESIZE - $LOGLINE`
 	sed "1,"${ENDPOS}"d" $LOGFILE >> $LOGFILETEMP
 	rm $LOGFILE
 	mv $LOGFILETEMP $LOGFILE
-	echo "$DATENOW-$USER-$WAR-LOG Excedido" >> $LOGFILE 
+	echo "$DATENOW-$USER-$WAR-LOG Excedido" >> $LOGFILE
 fi
 
 #Escribo el log
-echo "$DATENOW-$USER-$PCMD$TYPE-$PMSG" >> $LOGFILE 
+echo "$DATENOW-$USER-$PCMD$TYPE-$PMSG" >> $LOGFILE
 
 exit 0
