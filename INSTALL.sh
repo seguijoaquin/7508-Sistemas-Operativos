@@ -5,7 +5,7 @@ BASEDIR= "."
 ACTUALDIR="./"
 
 LOGFILEINS="install.log"
-GRUPO="./GRUPO7"
+GRUPO="./GRUPO07"
 CONFDIRINSTALL="./conf"
 
 CONFDIR="$GRUPO/conf"
@@ -179,7 +179,7 @@ function initInstalation(){
 	getDirectoryPath "Defina el directorio de grabación los archivos rechazados ($NOKDIR):" "$NOKDIR"
 	NOKDIR=$pathTemp
 	echo "NOKDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
-	
+
 	#Agrego directorio de Backup al archivo de configuracion
 	echo "BACKUPDIR=$BACKUPDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
@@ -347,16 +347,19 @@ function executeInstaler(){
 	echo "Instalando Programas y Funciones"
 	#Muevo el script para mover archivos
 	#for i in $(ls *.sh *.pl)
-	for i in $(ls *.sh)
+	for i in $(ls bin/*.sh)
 	 do
-		cp "$i" "$BASEDIR$BINDIR/$i"
-		chmod u+x "$BASEDIR$BINDIR/$i"
+		cp "$i" "$BASEDIR$BINDIR/"
 	done
-	for i in $(ls *.pl)
+	for i in $(ls bin/*.pl)
 	 do
-		cp "$i" "$BASEDIR$BINDIR/$i"
-		chmod u+x "$BASEDIR$BINDIR/$i"
+		cp "$i" "$BASEDIR$BINDIR/"
 	done
+
+  for i in $(ls "$BASEDIR$BINDIR")
+    do
+      chmod u+x "$i"
+  done
 
 	#Muevo la configuracion creada por el instalador.
 	#for i in $(ls $CONFDIRINSTALL)
@@ -368,10 +371,10 @@ function executeInstaler(){
 
 	#Mover los archivos maestros y tablas al directorio MAEDIR mostrando el siguiente mensaje
 	echo "Instalando Archivos Maestros y Tablas"
-	#for i in $(ls $DATOSDIR)
-	# do
-	#cp "$DATOSDIR/$i" "$BASEDIR$MAEDIR/"
-	#done
+	for i in $(ls mae/*)
+	 do
+	cp "$i" "$BASEDIR$MAEDIR/"
+	done
 
 
 	#Actualizar el archivo de configuración mostrando el siguiente mensaje
@@ -394,7 +397,7 @@ function executeInstaler(){
 	#Copio todo al directorio de respaldo
 	mkdir -p $BACKUPDIR
 
-	for i in $(ls *.*)
+	for i in $(ls bin/*.*)
 	 do
 		cp "$i" "$BACKUPDIR/$i"
 		#mv "$i" "$BACKUPDIR/$i"
@@ -556,7 +559,7 @@ then
 		VAR_COMPLETO=( ${VAR_COMPLETO[*]} NOKDIR)
 	fi
 
-	
+
 
 	if [ ${#VAR_FALTANTES[@]} -eq 0 ] #No falta ninguna variable en el archivo temporal
 	then
@@ -727,4 +730,3 @@ else
 	executeInstaler "LISTA"
 exit 0;
 fi
-
