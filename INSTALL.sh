@@ -435,6 +435,8 @@ then
 	log "Installer" "Hay una instalación" "I"
 
 	BASEDIRTMP=$(grep '^GRUPO' $CONFIGFILETEMP | awk -F"=" '{print $2}')
+	CONFIGDIRTMP=$(grep '^CONFDIR' $CONFIGFILETEMP | awk -F"=" '{print $2}')
+	SLEEPTIMETMP=$(grep '^SLEEPTIME' $CONFIGFILETEMP | awk -F"=" '{print $2}')
 	BINDIRTMP=$(grep '^BINDIR' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
 	MAEDIRTMP=$(grep '^MAEDIR' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
 	ARRIDIRTMP=$(grep '^ARRIDIR' $CONFIGFILETEMP | awk -F"=" '{print $2}' )
@@ -454,6 +456,16 @@ then
 	if [ -z $BASEDIRTMP ]
 	then
 		echo "GRUPO=$GRUPO=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+	fi
+
+	if [ -z $CONFIGDIRTMP ]
+	then
+		echo "CONFDIR=$CONFDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+	fi
+
+	if [ -z $SLEEPTIMETMP ]
+	then
+		echo "SLEEPTIME=$SLEEPTIME=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 	fi
 
 	if [ -z $BINDIRTMP ]
