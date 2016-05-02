@@ -460,7 +460,7 @@ if [ "$?" =  1 ]; then
 		printError "Los parametros de entrada no fueron introducidos correctamente"
 		echo -e "Recuerde que el comando debe ejecutarse de la siguiente manera:"
 		echo -e "PrepararAmbiente.sh \"/home/.../CIPAK.conf\" \n"
-		return 1
+		exit 1
 	fi
 
 	CONFIG_FILE=$1
@@ -473,18 +473,18 @@ if [ "$?" =  1 ]; then
 
 	if [ "$VALOR_RETORNO" = 1 ]; then
 		repararInstalacion "$CONFIG_FILE"
-		return 1
+		exit 1
 
 	elif [ "$VALOR_RETORNO" = 2 ]; then
 		#Archivo de configuracion invalido
 		echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
-		return 1
+		exit 1
 	fi
 
 	seteoDePermisos "$CONFIG_FILE"
 
 	if [ "$?" = 1 ]; then
-		return 1
+		exit 1
 	fi
 
 	levantarVariablesDesdeElArchivo "$CONFIG_FILE"
