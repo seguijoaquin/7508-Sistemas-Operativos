@@ -29,6 +29,8 @@ LOGEXT=".log"
 LOGSIZE=400 #400Kb #LOGSIZE=409600 #400Kb
 LOGCOMMAND="./GrabarBitacora.sh"
 VERSIONPERL=5
+
+SLEEPTIME=1
 #*************************** Funciones ***************************
 function log() {
         command=$1
@@ -101,6 +103,9 @@ function initInstalation(){
 	fi
 
 	echo "GRUPO=$GRUPO=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+
+	echo "CONFDIR=$CONFDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
+	echo "SLEEPTIME=$SLEEPTIME=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
 	getDirectoryPath "Defina el directorio de instalación de los ejecutables ($BINDIR):" "$BINDIR"
 	BINDIR=$pathTemp
