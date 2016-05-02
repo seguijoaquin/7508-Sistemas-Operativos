@@ -1,15 +1,14 @@
 #!/bin/bash
 #Instalador CIPAK - Grupo 7
 #*************************** Variables ***************************
-BASEDIR= "."
 ACTUALDIR="./"
 
 LOGFILEINS="install.log"
-GRUPO="./GRUPO07"
+GRUPO="${1-$PWD/GRUPO07}" # usa el primer parámetro o el directorio actual
 CONFDIRINSTALL="./conf"
 
-CONFDIR="$GRUPO/conf"
-CONFIGFILE="$GRUPO/conf/CIPAK.cnf"
+CONFDIR="$GRUPO/config"
+CONFIGFILE="$CONFDIR/CIPAK.cnf"
 CONFIGFILETEMP="$CONFDIRINSTALL/CIPAK.temp"
 
 pathResult=""
@@ -23,23 +22,23 @@ PROCDIR="$GRUPO/procesados"
 INFODIR="$GRUPO/informes"
 LOGDIR="$GRUPO/bitacoras"
 NOKDIR="$GRUPO/rechazados"
-#DATOSDIR="./datos"
+DATOSDIR="./mae"
 DATASIZE=100 #100Mb  #DATASIZE=104857600 #100Mb
 LOGEXT=".log"
 LOGSIZE=400 #400Kb #LOGSIZE=409600 #400Kb
-LOGCOMMAND="./GrabarBitacora.sh"
+LOGCOMMAND="./bin/GrabarBitacora.sh"
 VERSIONPERL=5
 
 SLEEPTIME=1
 #*************************** Funciones ***************************
 function log() {
-        command=$1
-        message=$2
-        type=$3
-        if [ $# -ge 2 ] && [ $# -le 3 ]
-        then
-			$LOGCOMMAND "$command" "$message" "$type"
-        fi
+	command=$1
+	message=$2
+	type=$3
+	if [ $# -ge 2 ] && [ $# -le 3 ]
+	then
+		$LOGCOMMAND "$command" "$message" "$type"
+	fi
 }
 
 function initInstalation(){
@@ -186,6 +185,8 @@ function initInstalation(){
 }
 
 function getDirectoryPath(){
+	# echo $1
+	# echo $2
 	msj=$1
 	pathDefault=$2
 	pathTemp=""
@@ -293,12 +294,12 @@ function executeInstaler(){
 		exit 4
 	fi
 
-	if [ -d $BASEDIR$GRUPO ]
+	if [ -d "$GRUPO" ]
 	then
 		deletDirOpt=""
 		while [ -z $deletDirOpt ]
 		do
-			read -p "Existen una instalación en el directorio $BASEDIR$GRUPO, se borraran todos los datos para realizar la nueva instalacion, esta seguro? (Si - No): " deletDirOpt
+			read -p "Existen una instalación en el directorio $GRUPO, se borraran todos los datos para realizar la nueva instalacion, esta seguro? (Si - No): " deletDirOpt
 			optSelect=$(echo $deletDirOpt | grep '^[Ss][Ii]$\|^[Nn][Oo]$' | tr '[:upper:]' '[:lower:]')
 		done
 
@@ -307,41 +308,41 @@ function executeInstaler(){
 			log "Installer" "El usuario no quiere eliminar el directorio $GRUPO existente" "I"
 			exit 5
 		else
-			log "Installer" "Eliminando contenido de directorio $BASEDIR$GRUPO" "I"
-			rm -rf $BASEDIR$GRUPO
+			log "Installer" "Eliminando contenido de directorio $GRUPO" "I"
+			rm -rf "$GRUPO"
 		fi
 	fi
 
 	clear
 	echo "Creando Estructuras de directorio. . . . "
-	echo $BASEDIR$BINDIR
-	mkdir -p $BASEDIR$BINDIR
+	echo "$BINDIR"
+	mkdir -p "$BINDIR"
 
-	echo $BASEDIR$MAEDIR
-	mkdir -p $BASEDIR$MAEDIR
+	echo "$MAEDIR"
+	mkdir -p "$MAEDIR"
 
-	echo $BASEDIR$OKDIR
-	mkdir -p $BASEDIR$OKDIR
+	echo "$OKDIR"
+	mkdir -p "$OKDIR"
 
-	echo $BASEDIR$PROCDIR
-	mkdir -p $BASEDIR$PROCDIR
+	echo "$PROCDIR"
+	mkdir -p "$PROCDIR"
 
-	echo $BASEDIR$INFODIR
-	mkdir -p $BASEDIR$INFODIR
+	echo "$INFODIR"
+	mkdir -p "$INFODIR"
 
-	echo $BASEDIR$LOGDIR
-	mkdir -p $BASEDIR$LOGDIR
+	echo "$LOGDIR"
+	mkdir -p "$LOGDIR"
 
-	echo $BASEDIR$ARRIDIR
-	mkdir -p $BASEDIR$ARRIDIR
+	echo "$ARRIDIR"
+	mkdir -p "$ARRIDIR"
 
-	echo $BASEDIR$NOKDIR
-	mkdir -p $BASEDIR$NOKDIR
+	echo "$NOKDIR"
+	mkdir -p "$NOKDIR"
 
-	mkdir -p $BASEDIR$GRUPO/conf
+	mkdir -p "$CONFDIR"
 
-	#cp "MoverA.sh" "$BASEDIR$BINDIR/MoverA.sh"
-	#chmod +r+x "$BASEDIR$BINDIR/MoverA.sh"
+	#cp "MoverA.sh" "$BINDIR/MoverA.sh"
+	#chmod +r+x "$BINDIR/MoverA.sh"
 
 	#Mover los ejecutables y funciones al directorio BINDIR mostrando el siguiente mensaje
 	echo "Instalando Programas y Funciones"
@@ -349,46 +350,43 @@ function executeInstaler(){
 	#for i in $(ls *.sh *.pl)
 	for i in $(ls bin/*.sh)
 	 do
-		cp "$i" "$BASEDIR$BINDIR/"
+		cp "$i" "$BINDIR/"
 	done
 	for i in $(ls bin/*.pl)
 	 do
-		cp "$i" "$BASEDIR$BINDIR/"
+		cp "$i" "$BINDIR/"
 	done
 
-  for i in $(ls "$BASEDIR$BINDIR")
-    do
-      chmod u+x "$i"
-  done
+	for i in $(ls "$BINDIR")
+	 do
+		chmod u+x "$BINDIR/$i"
+	done
 
 	#Muevo la configuracion creada por el instalador.
 	#for i in $(ls $CONFDIRINSTALL)
 	#do
-	#	cp "$CONFDIRINSTALL/$i" "$BASEDIR$GRUPO/conf/$i"
+	#	cp "$CONFDIRINSTALL/$i" "$CONFDIR/$i"
 	#done
 
-	LOGCOMMAND="$BASEDIR$BINDIR/GrabarBitacora.sh"
+	LOGCOMMAND="$BINDIR/GrabarBitacora.sh"
 
 	#Mover los archivos maestros y tablas al directorio MAEDIR mostrando el siguiente mensaje
 	echo "Instalando Archivos Maestros y Tablas"
-	for i in $(ls mae/*)
+	for i in $(ls $DATOSDIR/*)
 	 do
-	cp "$i" "$BASEDIR$MAEDIR/"
+		cp "$i" "$MAEDIR/"
 	done
-
 
 	#Actualizar el archivo de configuración mostrando el siguiente mensaje
 	echo "Actualizando la configuración del sistema"
 	log "Installer" "Actualizando la configuración del sistema" "I"
 
-	log "Installer" "Convirtiendo $BASEDIR$GRUPO/conf/  ->  $CONFIGFILE" "I"
+	log "Installer" "Convirtiendo $CONFDIR/  ->  $CONFIGFILE" "I"
 
 	cp "$CONFIGFILETEMP" "$CONFIGFILE"
 
 	#copiando log de instalacion a bitacoras.
-	cp "$CONFDIRINSTALL/GraLog.log" "$BASEDIR$LOGDIR/Installer.log"
-
-	#cp -r "$BASEDIR/Datos/MAE/." "$BASEDIR$MAEDIR/"
+	cp "$CONFDIRINSTALL/GraLog.log" "$LOGDIR/Installer.log"
 
 	echo "Instalación CONCLUIDA"
 	log "Installer" "Instalación CONCLUIDA" "I"
@@ -397,9 +395,9 @@ function executeInstaler(){
 	#Copio todo al directorio de respaldo
 	mkdir -p $BACKUPDIR
 
-	for i in $(ls bin/*.*)
+	for i in $(ls bin)
 	 do
-		cp "$i" "$BACKUPDIR/$i"
+		cp "bin/$i" "$BACKUPDIR/$i"
 		#mv "$i" "$BACKUPDIR/$i"
 	done
 
@@ -428,8 +426,8 @@ log "Installer" "Inicio de Ejecución de Installer"
 echo "Log de la instalación: $CONFDIRINSTALL/$LOGFILEINS"
 log "Installer" "Log de la instalación: $CONFDIRINSTALL/$LOGFILEINS"
 
-echo "Directorio predefinido de configuración: $GRUPO/conf"
-log "Installer" "Directorio predefinido de configuración: $GRUPO/conf"
+echo "Directorio predefinido de configuración: $CONFDIR"
+log "Installer" "Directorio predefinido de configuración: $CONFDIR"
 
 #Detecto si hay una instalacion previa
 if [ -a $CONFIGFILETEMP ]

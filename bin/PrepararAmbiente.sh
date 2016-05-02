@@ -458,8 +458,9 @@ if [ "$?" =  1 ]; then
 	#Input
 	if [[ ! "$1" ]]; then
 		printError "Los parametros de entrada no fueron introducidos correctamente"
-		echo -e "Recuerde que el comando debe ejecutarse de la siguiente manera:"
-		echo -e "PrepararAmbiente.sh \"/home/.../CIPAK.conf\" \n"
+		echo -e "Uso: PrepararAmbiente.sh CONF \n"
+		echo -e "CONF es la ruta al archivo de configuración, que puede ser generado por INSTALL.sh."
+		echo -e "Por ejemplo \"/home/usuario/CIPAK/CIPAK.cnf\" \n"
 		exit 1
 	fi
 
