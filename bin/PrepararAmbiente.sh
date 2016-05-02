@@ -148,7 +148,7 @@ comprobarInstalacion () {
 	if $ARRIDIR_INST; then comprobarDirectorio "$VALOR"; if [ "$?" = 1 ]; then ARRIDIR_INST=false; fi; fi
 
 	#BACKUPDIR
-	VALOR=$( grep "^BACKUPDIR.*$" "$1" | sed "s-\(^ARRIDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+	VALOR=$( grep "^BACKUPDIR.*$" "$1" | sed "s-\(^BACKUPDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
 	if $BACKUPDIR_INST; then comprobarVariable "$VALOR" BACKUPDIR; if [ "$?" = 1 ]; then BACKUPDIR_INST=false; fi; fi
 	if $BACKUPDIR_INST; then comprobarDirectorio "$VALOR"; if [ "$?" = 1 ]; then BACKUPDIR_INST=false; fi; fi
 
