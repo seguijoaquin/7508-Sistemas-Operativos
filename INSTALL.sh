@@ -29,7 +29,7 @@ LOGSIZE=400 #400Kb #LOGSIZE=409600 #400Kb
 LOGCOMMAND="./bin/GrabarBitacora.sh"
 VERSIONPERL=5
 
-SLEEPTIME=1
+SLEEPTIME=20
 #*************************** Funciones ***************************
 function pause() {
    read -p "$*"
@@ -110,7 +110,7 @@ function initInstalation(){
 	echo "GRUPO=$GRUPO=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
 	echo "CONFDIR=$CONFDIR=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
-	
+
 	readNumber "Defina tiempo de espera entre ejecuciones de Procesar Ofertas ($SLEEPTIME)" "$SLEEPTIME"
 	SLEEPTIME=$numberTemp
 	echo "SLEEPTIME=$SLEEPTIME=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
