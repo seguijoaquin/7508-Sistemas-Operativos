@@ -188,7 +188,7 @@ copiarArchivos () {
 	if ( "$GRUPO_INST" ); then
 		GRUPO=$( grep "^GRUPO.*$" "$1" | sed "s-\(^GRUPO=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
 		BINDIR=$( grep "^BINDIR.*$" "$1" | sed "s-\(^BINDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
-		#TODO: Copiar desde backupdir a bindir
+		#TODO: Chequear que BINDIR no sea cualquier cosa y se copie en cualquier lado
 		for i in $(ls "$BACKUPDIR")
 		 do
 			cp "$BACKUPDIR/$i" "$BINDIR/$i"
@@ -353,6 +353,10 @@ levantarVariablesDesdeElArchivo () {
 
 	#Variables
 
+	#SEC_DUPLICADOS
+	sec_duplicados=1
+	export sec_duplicados
+	
 	#LOGSIZE
 	LOGSIZE=$( grep "^LOGSIZE.*$" "$1" | sed "s-\(^LOGSIZE=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
 	export LOGSIZE
