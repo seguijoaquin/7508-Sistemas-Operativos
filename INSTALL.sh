@@ -405,12 +405,18 @@ function executeInstaler(){
 
 	#Copio todo al directorio de respaldo
 	mkdir -p $BACKUPDIR
+  mkdir -p "$BACKUPDIR"/mae
+  mkdir -p "$BACKUPDIR"/bin
 
 	for i in $(ls bin)
 	 do
-		cp "bin/$i" "$BACKUPDIR/$i"
-		#mv "$i" "$BACKUPDIR/$i"
+		cp "bin/$i" "$BACKUPDIR/bin/$i"
 	done
+
+  for i in $(ls mae)
+   do
+    cp "mae/$i" "$BACKUPDIR/mae/$i"
+  done
 
 
 	#Elimino Archivos

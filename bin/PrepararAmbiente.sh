@@ -178,9 +178,20 @@ comprobarInstalacion () {
 #Recibe como primer parametro la ruta del archivo CIPAK.cnf
 #Segundo parametro es la ruta de scripts de respaldo
 copiarArchivos () {
-	if ( "$BACKUPDIR_INST" ); then
+	if ( "$BACKUPDIR_INST" && "$GRUPO_INST"); then
 		BACKUPDIR=$( grep "^BACKUPDIR.*$" "$1" | sed "s-\(^BACKUPDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
-		export BACKUPDIR
+		GRUPO=$( grep "^GRUPO.*$" "$1" | sed "s-\(^GRUPO=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+		BINDIR=$( grep "^BINDIR.*$" "$1" | sed "s-\(^BINDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+		MAEDIR=$( grep "^MAEDIR.*$" "$1" | sed "s-\(^MAEDIR=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
+		#TODO: Chequear que BINDIR y MAEDIR no sean cualquier cosa y se copien archivos en cualquier lado
+		for i in $(ls "$BACKUPDIR"/bin)
+		 do
+			cp "$BACKUPDIR/bin/$i" "$BINDIR/$i"
+		done
+		for i in $(ls "$BACKUPDIR"/mae)
+		 do
+			cp "$BACKUPDIR/mae/$i" "$MAEDIR/$i"
+		done
 	else
 		return 1
 	fi
@@ -356,7 +367,7 @@ levantarVariablesDesdeElArchivo () {
 	#SEC_DUPLICADOS
 	sec_duplicados=1
 	export sec_duplicados
-	
+
 	#LOGSIZE
 	LOGSIZE=$( grep "^LOGSIZE.*$" "$1" | sed "s-\(^LOGSIZE=\)\([^=]*\)\(=[^=]*=[^=]*$\)-\2-" )
 	export LOGSIZE
