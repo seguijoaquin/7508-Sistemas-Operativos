@@ -19,6 +19,7 @@ my $graba_file;
 my $archivo_sorteo;
 my $fecha_adj;
 my $idSorteo;
+my $file_sorteo_out;
 
 getopts('ag', \%opts) or die mostrar_ayuda();
 
@@ -37,9 +38,7 @@ else
 
 	if ($graba_file)
 	{
-		open my $file_sorteo, ">>", "${INFODIR}/$archivo_sorteo" or die "Can't open '${INFODIR}/$archivo_sorteo'\n";
-		open my $file_gansorteo, ">>", "${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_S" or die "Can't open '${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_S'\n";
-		open my $file_ganlicit, ">>", "${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_L" or die "Can't open '${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_L'\n";
+		open $file_sorteo_out, ">>", "${INFODIR}/$archivo_sorteo" or die "Can't open '${INFODIR}/$archivo_sorteo'\n";
 	}
 	procesar(@lista_grupos);
 }
@@ -55,10 +54,10 @@ sub procesar
 		limpiar_pantalla();
 
 		print "1. Resultado general del sorteo\n".
-					"2. Ganadores por sorteo\n".
-					"2. Ganadores por licitacion\n". 
-					"4. Resultados por grupo\n". 
-					"5. Salir\n";
+		      "2. Ganadores por sorteo\n".
+		      "3. Ganadores por licitacion\n". 
+		      "4. Resultados por grupo\n". 
+		      "5. Salir\n";
 
 		print "Seleccione una opción: ";
 		$input = <STDIN>;
@@ -70,24 +69,28 @@ sub procesar
 			{
 				$input = '';
 				mostrar_resutado_general();
+				$input = <STDIN>;
 				$input = '';
 			}
 			case '2'
 			{
 				$input = '';
 				mostrar_ganadores_sorteo();
+				$input = <STDIN>;
 				$input = '';
 			}
 			case '3'
 			{
 				$input = '';
 				mostrar_ganadores_licitacion();
+				$input = <STDIN>;
 				$input = '';
 			}
 			case '4'
 			{
 				$input = '';
 				mostrar_resultados_grupo();
+				$input = <STDIN>;
 				$input = '';
 			}
 		}
@@ -104,15 +107,15 @@ sub ganadores_por_sorteo
 {
 	my $csv_padron = Text::CSV->new({ sep_char => ';' }) or die "Cannot use CSV: ".Text::CSV->error_diag ();
 	my $file_padron = "$MAEDIR/temaK_padron.mae";
-	open(my $data_padron, '<', $file_padron) or die "No se puede abrir el archivo '$file_padron' $!\n";
+	open(my $data_padron, '<:encoding(iso8859-1)', $file_padron) or die "No se puede abrir el archivo '$file_padron' $!\n";
 
 	my $csv_sorteo = Text::CSV->new({ sep_char => ';' }) or die "Cannot use CSV: ".Text::CSV->error_diag ();
 	my $file_sorteo = "$PROCDIR/sorteos/$archivo_sorteo";
-	open(my $data_sorteo, '<', $file_sorteo) or die "No se puede abrir el archivo '$file_sorteo' $!\n";
+	open(my $data_sorteo, '<:encoding(iso8859-1)', $file_sorteo) or die "No se puede abrir el archivo '$file_sorteo' $!\n";
 
-	my $csv_grupo = Text::CSV->new({ chharacter => ';' }) or die "Cannot use CSV: ".Text::CSV->error_diag ();
+	my $csv_grupo = Text::CSV->new({ sep_char => ';' }) or die "Cannot use CSV: ".Text::CSV->error_diag ();
 	my $file_grupo = "$MAEDIR/grupos.mae";
-	open(my $data_grupo, '<', $file_grupo) or die "No se puede abrir el archivo '$file_grupo' $!\n";
+	open(my $data_grupo, '<:encoding(iso8859-1)', $file_grupo) or die "No se puede abrir el archivo '$file_grupo' $!\n";
 	
 	my @datos_ganador; #Array con los datos del ganador
 	my $numero_menor = 168;
@@ -127,7 +130,7 @@ sub ganadores_por_sorteo
 			chomp $line_grupo;
 			if ($csv_grupo->parse($line_grupo))
 			{
-				my @fields_grupo = $csv_grupo->fields_grupo();
+				my @fields_grupo = $csv_grupo->fields();
 				if ($fields_grupo[0] == $g)
 				{
 					if ($fields_grupo[1] eq "ABIERTO")
@@ -150,7 +153,7 @@ sub ganadores_por_sorteo
 				chomp $line_padron;
 				if ($csv_padron->parse($line_padron))
 				{
-					my @fields_padron = $csv_padron->fields_padron();
+					my @fields_padron = $csv_padron->fields();
 					if ($fields_padron[0] == $g) #Si el campo grupo es el grupo sobre el que estoy procesando
 					{
 						if (($fields_padron[5] == 1) || ($fields_padron[5] == 2)) #Si participa, lo agrego al hash
@@ -174,14 +177,14 @@ sub ganadores_por_sorteo
 				chomp $line_sorteo;
 				if ($csv_sorteo->parse($line_sorteo))
 				{
-					my @fields_sorteo = $csv_sorteo->fields_sorteo();
+					my @fields_sorteo = $csv_sorteo->fields();
 					for my $p (keys %padron)
 					{
 						if ($fields_sorteo[0] == $p) 
 						{
 							if ($graba_file)
 							{
-								print $file_sorteo "Numero de Sorteo $fields_sorteo[1], le corresponde al orden $p\n";
+								print $file_sorteo_out "Numero de Sorteo $fields_sorteo[1], le corresponde al orden $p\n";
 							}
 							if ($fields_sorteo[1] < $numero_menor)
 							{
@@ -197,13 +200,14 @@ sub ganadores_por_sorteo
 				}
 			}
 			#Meto en el hash como clave el sorteo y como dato el orden
-			$ganadores_sorteo{$g} = @datos_ganador;
+			$ganadores_sorteo{$g} = [@datos_ganador];
 			if ($graba_file)
 			{
+				my @ganador = @{$ganadores_sorteo{$g}};
 				open my $file_gansorteo, ">>", "${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_S" or die "Can't open '${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_S'\n";
-				print $file_gansorteo "Ganador por sorteo del grupo $g Nro de Orden: $ganadores_sorteo{$g}[0], $ganadores_sorteo{$g}[2] (Nro deSorteo $ganadores_sorteo{$g}[1])\n";
+				print $file_gansorteo "Ganador por sorteo del grupo $g Nro de Orden: $ganador[0], $ganador[2] (Nro de Sorteo $ganador[1])\n";
 				open my $file_resultgrupo, ">>", "${INFODIR}/${idSorteo}_Grupo${g}_${fecha_adj}" or die "Can't open '${INFODIR}/${idSorteo}_Grupo${g}_${fecha_adj}'\n";
-				print $file_resultgrupo "Ganador por sorteo del grupo $g Nro de Orden: $ganadores_sorteo{$g}[0], $ganadores_sorteo{$g}[2] (Nro deSorteo $ganadores_sorteo{$g}[1])\n";
+				print $file_resultgrupo "Ganador por sorteo del grupo $g Nro de Orden: $ganador[0], $ganador[2] (Nro de Sorteo $ganador[1])\n";
 			}
 		}
 	}
@@ -213,11 +217,12 @@ sub ganadores_por_licitacion
 {
 	my $csv_sorteo = Text::CSV->new({ sep_char => ';' });
 	my $file_sorteo = "$PROCDIR/sorteos/$archivo_sorteo";
-	open(my $data_sorteo, '<', $file_sorteo) or die "No se puede abrir el archivo '$file_sorteo' $!\n";
+	open(my $data_sorteo, '<:encoding(iso8859-1)', $file_sorteo) or die "No se puede abrir el archivo '$file_sorteo' $!\n";
 
 	my $csv_validas = Text::CSV->new({ sep_char => ';' });
-	my $file_validas= "$PROCDIR/validas/$fecha_adj";
-	open(my $data_validas, '<', $file_validas) or die "No se puede abrir el archivo '$file_validas' $!\n";
+	my @fecha_validas_partes = split('-', $fecha_adj);
+	my $file_validas= "$PROCDIR/validas/${fecha_validas_partes[2]}${fecha_validas_partes[1]}${fecha_validas_partes[0]}";
+	open(my $data_validas, '<:encoding(iso8859-1)', $file_validas) or die "No se puede abrir el archivo '$file_validas' $!\n";
 	
 	my $mayor_oferta = 0;
 	my @datos_ganador; #Array con los datos del ganador
@@ -228,7 +233,7 @@ sub ganadores_por_licitacion
 		chomp $line_sorteo;
 		if ($csv_sorteo->parse($line_sorteo))
 		{
-			my @fields_sorteo= $csv_sorteo->fields_sorteo();
+			my @fields_sorteo= $csv_sorteo->fields();
 			$sorteo{$fields_sorteo[0]} = $fields_sorteo[1];
 		}
 		else
@@ -246,22 +251,25 @@ sub ganadores_por_licitacion
 			chomp $line_validas;
 			if ($csv_validas->parse($line_validas))
 			{
-				my @fields_validas = $csv_validas->fields_validas();
-				if ($fields_validas[4] !=  $ganadores_sorteo{$g}[0]) #Comparo el ganador del sorteo para el grupo en proceso
+				my @fields_validas = $csv_validas->fields();
+				my @ganador = @{$ganadores_sorteo{$g}};
+				if ($fields_validas[4] != $ganador[0]) #Comparo el ganador del sorteo para el grupo en proceso
 				{
+					$mayor_oferta =~ s/\,/\./;
+					$fields_validas[5] =~ s/\,/\./;
 					if ($fields_validas[5] > $mayor_oferta)
 					{
 						$mayor_oferta = $fields_validas[5];
 						#Orden, Importe, Nombre, Sorteo
-						@datos_ganador=($fields_validas[4], $fields_validas[5], $fields_validas[6], $sorteo{$fields_validas[6]});
+						@datos_ganador=($fields_validas[4], $fields_validas[5], $fields_validas[6], $sorteo{$fields_validas[4] * 1});
 					}
 					elsif ($fields_validas[5] == $mayor_oferta) #En caso de empate, desempatar por sorteo
 					{
-						if ($datos_ganador[4] < $sorteo{$fields_validas[6]}) #Si el numero de sorteo del actual en proceso es mayor al que ya existe, entonces lo cambio
+						if ($datos_ganador[4] < $sorteo{$fields_validas[4] * 1}) #Si el numero de sorteo del actual en proceso es mayor al que ya existe, entonces lo cambio
 						{
 							$mayor_oferta = $fields_validas[5];
 							#Orden, Importe, Nombre, Sorteo
-							@datos_ganador=($fields_validas[4], $fields_validas[5], $fields_validas[6], $sorteo{$fields_validas[6]});
+							@datos_ganador=($fields_validas[4], $fields_validas[5], $fields_validas[6], $sorteo{$fields_validas[4] * 1});
 						}
 					}
 				}
@@ -271,7 +279,7 @@ sub ganadores_por_licitacion
 				warn "Error en el formato de línea en: $line_validas\n";
 			}
 		}
-		$ganadores_licitacion{$g} = @datos_ganador;
+		$ganadores_licitacion{$g} = [@datos_ganador];
 		if ($graba_file)
 		{
 			open my $file_ganlicit, ">>", "${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_L" or die "Can't open '${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_L'\n";
@@ -299,7 +307,7 @@ sub analizar_grupos
 
 sub mostrar_resultados_grupo
 {
-	print "Ganadores por Grupo en el acto de adjudicación de fecha $fecha_adj, Sorteo: $idSorteo)";
+	print "Ganadores por Grupo en el acto de adjudicación de fecha $fecha_adj, Sorteo: $idSorteo)\n";
 	foreach my $s (keys %ganadores_sorteo)
 	{
 		print "$s - $ganadores_sorteo{$s}[0] S $ganadores_sorteo{$s}[2]\n";
@@ -309,19 +317,21 @@ sub mostrar_resultados_grupo
 
 sub mostrar_ganadores_licitacion
 {
-	print "Ganadores por Licitación $idSorteo de fecha $fecha_adj";
+	print "Ganadores por Licitación $idSorteo de fecha $fecha_adj\n";
 	foreach my $g (keys %ganadores_licitacion)
 	{
-		print "Ganador por licitación del grupo $g: Numero de orden $ganadores_licitacion{$g}[0],  $ganadores_licitacion{$g}[2] con $ganadores_licitacion{$g}[1] (Nro de Sorteo  $ganadores_licitacion{$g}[3])\n";
+		my @ganador = @{$ganadores_licitacion{$g}};
+		print "Ganador por licitación del grupo $g: Numero de orden $ganador[0], $ganador[2] con $ganador[1] (Nro de Sorteo $ganador[3])\n";
 	}
 }
 
 sub mostrar_ganadores_sorteo
 {
-	print "Ganadores del Sorteo $idSorteo de fecha $fecha_adj";
+	print "Ganadores del Sorteo $idSorteo de fecha $fecha_adj\n";
 	foreach my $g (keys %ganadores_sorteo)
 	{
-		print "Ganador por sorteo del grupo $g Nro de Orden: $ganadores_sorteo{$g}[0], $ganadores_sorteo{$g}[2] (Nro deSorteo $ganadores_sorteo{$g}[1])\n";
+		my @ganador = @{$ganadores_sorteo{$g}};
+		print "Ganador por sorteo del grupo $g Nro de Orden: $ganador[0], $ganador[2] (Nro de Sorteo $ganador[1])\n";
 	}
 }
 
@@ -329,7 +339,7 @@ sub mostrar_resutado_general
 {
 	my $csv = Text::CSV->new({ sep_char => ';' });
 	my $file = "$PROCDIR/sorteos/$archivo_sorteo";
-	open(my $data, '<', $file) or die "No se puede abrir el archivo '$file' $!\n";
+	open(my $data, '<:encoding(iso8859-1)', $file) or die "No se puede abrir el archivo '$file' $!\n";
 	while (my $line = <$data>)
 	{
 		chomp $line;
