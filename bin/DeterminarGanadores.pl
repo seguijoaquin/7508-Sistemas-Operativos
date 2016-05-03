@@ -11,6 +11,9 @@ my %padron;
 my %sorteo;
 my %ganadores_sorteo;
 my %ganadores_licitacion;
+my %graba_file;
+
+
 getopts('ag', \%opts) or die mostrar_ayuda();
 
 if(defined $opts{a})
@@ -19,10 +22,21 @@ if(defined $opts{a})
 }
 else
 {
+	if (defined $opts{g}){
+		$graba_file = true;
+	}else{
+		$graba_file = false;
+	}
 	my $idSorteo = shift or die error_idSorteo();
 	my $grupos = shift or die error_grupos();
 	my @lista_grupos = analizar_grupos($grupos);
 	flock(DATA, 6) or die error_lock(); # 6 = non-blocking lock
+
+	if ($graba_file){
+		open my $file_sorteo, ">>", "${INFODIR}/${idSorteo}_${fecha_adj}" or die "Can't open '${INFODIR}/${idSorteo}_${fecha_adj}'\n";
+		open my $file_gansorteo, ">>", "${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_S" or die "Can't open '${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_S'\n";
+		open my $file_ganlicit, ">>", "${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_L" or die "Can't open '${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_L'\n";
+	}
 	procesar();
 }
 
@@ -101,6 +115,7 @@ sub ganadores_por_sorteo
 	my $participa = 0;
 	
 	foreach my $g (@lista_grupos) {
+
 		#Analizo si el grupo participa - grupo ABIERTO
 		$participa = 0;
 		while (my $line_grupo = <$data_grupo>) {
@@ -148,7 +163,10 @@ sub ganadores_por_sorteo
 				  my @fields_sorteo = $csv_sorteo->fields_sorteo();
 				  for my $p (keys %padron) {
 					 if($fields_sorteo[0] == $p) 
-					 {
+					 {	
+						if ($graba_file){
+							print $file_sorteo "Numero de Sorteo $fields_sorteo[1], le corresponde al orden $p\n";
+						}
 						if($fields_sorteo[1] < $numero_menor)
 						{
 							@datos_ganador=(); 
@@ -165,6 +183,12 @@ sub ganadores_por_sorteo
 			}
 			#Meto en el hash como clave el sorteo y como dato el orden
 			$ganadores_sorteo{$g} = $datos_ganador;
+			if ($graba_file){
+				print $file_gansorteo "Ganador por sorteo del grupo $g Nro de Orden: $ganadores_sorteo{$g}[0], $ganadores_sorteo{$g}[2] (Nro deSorteo $ganadores_sorteo{$g}[1])\n";
+
+				open my $file_resultgrupo, ">>", "${INFODIR}/${idSorteo}_Grupo${g}_${fecha_adj}" or die "Can't open '${INFODIR}/${idSorteo}_Grupo${g}_${fecha_adj}'\n";
+				print $file_resultgrupo "Ganador por sorteo del grupo $g Nro de Orden: $ganadores_sorteo{$g}[0], $ganadores_sorteo{$g}[2] (Nro deSorteo $ganadores_sorteo{$g}[1])\n";
+			}
 		}
 	}
 }
@@ -196,7 +220,7 @@ sub ganadores_por_licitacion
 	
 	foreach my $g (@lista_grupos) {
 		@datos_ganador=(); 
-		
+
 		while (my $line_validas = <$data_validas>) {
 		  chomp $line_validas;
 		  if ($csv_validas->parse($line_validas)) {
@@ -230,6 +254,11 @@ sub ganadores_por_licitacion
 		  }
 		}
 		$ganadores_licitacion{$g} = $datos_ganador;
+		if ($graba_file){
+			print $file_ganlicit "Ganador por licitación del grupo $g: Numero de orden $ganadores_licitacion{$g}[0],  $ganadores_licitacion{$g}[2] con $ganadores_licitacion{$g}[1] (Nro de Sorteo  $ganadores_licitacion{$g}[3])\n";			
+			open my $file_resultgrupo, ">>", "${INFODIR}/${idSorteo}_Grupo${g}_${fecha_adj}" or die "Can't open '${INFODIR}/${idSorteo}_Grupo${g}_${fecha_adj}'\n";
+			print $file_resultgrupo "Ganador por licitación del grupo $g: Numero de orden $ganadores_licitacion{$g}[0],  $ganadores_licitacion{$g}[2] con $ganadores_licitacion{$g}[1] (Nro de Sorteo  $ganadores_licitacion{$g}[3])\n";			
+		}
 }
 
 sub analizar_grupos
