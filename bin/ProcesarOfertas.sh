@@ -7,6 +7,15 @@ source MoverArchivo.sh
 #OKDIR="../aceptados"
 #PROCDIR="../procesados"
 
+# Evaluo que el ambiente haya sido inicializado.
+if [[ ! -z $MAEDIR ]] || [[ ! -z $OKIR ]] || [[ ! -z $PROCDIR ]] || [[ ! -z $NOKDIR ]]
+then
+	AMBIENTE_INICIALIZADO=true
+else
+	echo "El ambiente no ha sido inicializado. Invoque a \". ./PrepararAmbiente <Path archivo configuracion>\""
+	exit 1
+fi
+
 SUSCRIPTORES="$MAEDIR/temaK_padron.mae"
 FECHAS_ADJUDICACION="$MAEDIR/FechasAdj.mae"
 GRUPOS="$MAEDIR/grupos.mae"
