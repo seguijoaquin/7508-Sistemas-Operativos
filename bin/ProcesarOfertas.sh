@@ -7,6 +7,15 @@ source MoverArchivo.sh
 #OKDIR="../aceptados"
 #PROCDIR="../procesados"
 
+# Evaluo que el ambiente haya sido inicializado.
+if [[ ! -z $MAEDIR ]] || [[ ! -z $OKIR ]] || [[ ! -z $PROCDIR ]] || [[ ! -z $NOKDIR ]]
+then
+	AMBIENTE_INICIALIZADO=true
+else
+	echo "El ambiente no ha sido inicializado. Invoque a \". ./PrepararAmbiente <Path archivo configuracion>\""
+	exit 1
+fi
+
 SUSCRIPTORES="$MAEDIR/temaK_padron.mae"
 FECHAS_ADJUDICACION="$MAEDIR/FechasAdj.mae"
 GRUPOS="$MAEDIR/grupos.mae"
@@ -20,9 +29,9 @@ mkdir -p $RECHAZADOS
 mkdir -p $PROCESADOS
 
 
-function calcularFechaUltimoActo()
+function calcularFechaProximoActo()
 {
-	fechaUltActo="19900101" # Seteo una fecha para calcular luego
+	fechaProxActo="20380101" # Seteo una fecha para calcular luego
 	IFS="
 	" #Determina el internal field separator
 
@@ -31,13 +40,13 @@ function calcularFechaUltimoActo()
 		# Verifica que sea una fecha valida
 		if date -d "${fch:6:4}${fch:3:2}${fch:0:2}" &> /dev/null
 		then
-			# Verifica que la fecha sea menor a la fecha actual
-			if (( ($(date -d "${fch:6:4}${fch:3:2}${fch:0:2}" +%s) < $(date +%s)) ))
+			# Verifica que la fecha sea mayor a la fecha actual
+			if (( ($(date -d "${fch:6:4}${fch:3:2}${fch:0:2}" +%s) >= $(date +%s)) ))
 			then
-				# Verifica que la fecha guardada anteriormente no sea posterior a esta
-				if (( ($(date -d "${fch:6:4}${fch:3:2}${fch:0:2}" +%s) > $(date -d "$fechaUltActo" +%s)) ))
+				# Verifica que la fecha guardada anteriormente no sea anterior a esta
+				if (( ($(date -d "${fch:6:4}${fch:3:2}${fch:0:2}" +%s) < $(date -d "$fechaProxActo" +%s)) ))
 				then
-					fechaUltActo="${fch:6:4}${fch:3:2}${fch:0:2}"
+					fechaProxActo="${fch:6:4}${fch:3:2}${fch:0:2}"
 				fi
 			fi
 		fi
@@ -168,7 +177,7 @@ function grabarOfertaValida()
 	auxUser=$USER # Usuario
 	auxFechaActual="$(date +%d)/$(date +%m)/$(date +%Y)" # Fecha
 	registroOferta="$auxConcesionario;$auxFechaArchivo;$auxContrato;$auxGrupo;$auxNroOrden;${auxImporteOfertado:0:-1};$auxNombre;$auxUser;$auxFechaActual"
-	echo $registroOferta >> $ACEPTADOS/$fechaUltActo
+	echo $registroOferta >> $ACEPTADOS/$fechaProxActo
 }
 
 #--------------------------------------------------------------------------------------------------------#
@@ -180,7 +189,7 @@ cantidadArchivosOfertas=`ls -1 $OKDIR | wc -w` # Calcula cantidad de archivos a 
 ./GrabarBitacora.sh "ProcesarOfertas" "Inicio de ProcesarOfertas" "INFO"
 ./GrabarBitacora.sh "ProcesarOfertas" "Cantidad de archivos a procesar: $cantidadArchivosOfertas" "INFO"
 
-calcularFechaUltimoActo
+calcularFechaProximoActo
 archivoOfertaAceptado=false
 msg1=""
 

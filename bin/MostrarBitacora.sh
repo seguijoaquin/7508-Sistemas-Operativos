@@ -14,6 +14,17 @@ PROCESAROFERTAS="ProcesarOfertas"
 RECIBIROFERTAS="RecibirOfertas"
 EXT=".log"
 
+AMBIENTE_INICIALIZADO=false
+
+# Evaluo que el ambiente haya sido inicializado.
+if [[ ! -z $LOGDIR ]]
+then
+	AMBIENTE_INICIALIZADO=true
+else
+	echo "El ambiente no ha sido inicializado. Invoque a \". ./PrepararAmbiente <Path archivo configuracion>\""
+	exit 1
+fi
+
 function buscarBitacora()
 {
 	procesoMayus=`echo $PROCESO | tr [[:lower:]] [[:upper:]]`

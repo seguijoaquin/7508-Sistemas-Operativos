@@ -8,6 +8,16 @@ source MoverArchivo.sh
 #OKDIR="../aceptados"
 #NOKDIR="../rechazados"
 
+AMBIENTE_INICIALIZADO=false
+
+# Evaluo que el ambiente haya sido inicializado.
+if [[ ! -z $ARRIDIR ]] || [[ ! -z $MAEDIR ]] || [[ ! -z $OKDIR ]] || [[ ! -z $NOKDIR ]] || [[ ! -z $SLEEPTIME ]]
+then
+	AMBIENTE_INICIALIZADO=true
+else
+	echo "El ambiente no ha sido inicializado. Invoque a \". ./PrepararAmbiente <Path archivo configuracion>\""
+	exit 1
+fi
 
 CONCESIONARIOS="$MAEDIR/concesionarios.mae"
 FECHAS_ADJUDICACION="$MAEDIR/FechasAdj.mae"
@@ -194,3 +204,4 @@ do
 	fi
 	sleep $SLEEPTIME
 done
+
