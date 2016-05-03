@@ -6,7 +6,9 @@ use Switch;
 use warnings;
 use Text::CSV;
 
-my $INFODIR = $ENV{INFORDIR};
+my $INFODIR = $ENV{INFODIR};
+my $PROCDIR = $ENV{PROCDIR};
+my $MAEDIR = $ENV{MAEDIR};
 my %opts;
 my @lista_grupos;
 my %padron;
@@ -14,6 +16,7 @@ my %sorteo;
 my %ganadores_sorteo;
 my %ganadores_licitacion;
 my $graba_file;
+my $archivo_sorteo;
 my $fecha_adj;
 my $idSorteo;
 
@@ -26,14 +29,15 @@ if (defined $opts{a})
 }
 else
 {
-	$idSorteo = shift or die error_idSorteo();
+	$archivo_sorteo = shift or die error_idSorteo();
+	($idSorteo, $fecha_adj) = split('_', $archivo_sorteo);
 	my $grupos = shift or die error_grupos();
 	@lista_grupos = analizar_grupos($grupos);
 	flock(DATA, 6) or die error_lock(); # 6 = non-blocking lock
 
 	if ($graba_file)
 	{
-		open my $file_sorteo, ">>", "${INFODIR}/${idSorteo}_${fecha_adj}" or die "Can't open '${INFODIR}/${idSorteo}_${fecha_adj}'\n";
+		open my $file_sorteo, ">>", "${INFODIR}/$archivo_sorteo" or die "Can't open '${INFODIR}/$archivo_sorteo'\n";
 		open my $file_gansorteo, ">>", "${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_S" or die "Can't open '${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_S'\n";
 		open my $file_ganlicit, ">>", "${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_L" or die "Can't open '${INFODIR}/${idSorteo}_Grd$lista_grupos[0]-Grh$lista_grupos[$#lista_grupos]_${fecha_adj}_L'\n";
 	}
@@ -98,22 +102,22 @@ sub ejecutar_proceso
 
 sub ganadores_por_sorteo
 {
-	my $csv_padron = Text::CSV->new({ caracter => ';' });
-	my $file_padron = "archivo padron";	#TODO: poner nombre archivo correcto
+	my $csv_padron = Text::CSV->new({ sep_char => ';' }) or die "Cannot use CSV: ".Text::CSV->error_diag ();
+	my $file_padron = "$MAEDIR/temaK_padron.mae";
 	open(my $data_padron, '<', $file_padron) or die "No se puede abrir el archivo '$file_padron' $!\n";
-	
-	my $csv_sorteo = Text::CSV->new({ caracter => ';' });
-	my $file_sorteo = "archivo sorteo";	#TODO: poner nombre archivo correcto
+
+	my $csv_sorteo = Text::CSV->new({ sep_char => ';' }) or die "Cannot use CSV: ".Text::CSV->error_diag ();
+	my $file_sorteo = "$PROCDIR/sorteos/$archivo_sorteo";
 	open(my $data_sorteo, '<', $file_sorteo) or die "No se puede abrir el archivo '$file_sorteo' $!\n";
-	
-	my $csv_grupo = Text::CSV->new({ caracter => ';' });
-	my $file_grupo = "archivo grupo";	#TODO: poner nombre archivo correcto
+
+	my $csv_grupo = Text::CSV->new({ chharacter => ';' }) or die "Cannot use CSV: ".Text::CSV->error_diag ();
+	my $file_grupo = "$MAEDIR/grupos.mae";
 	open(my $data_grupo, '<', $file_grupo) or die "No se puede abrir el archivo '$file_grupo' $!\n";
 	
 	my @datos_ganador; #Array con los datos del ganador
 	my $numero_menor = 168;
 	my $participa = 0;
-	
+
 	foreach my $g (@lista_grupos)
 	{
 		#Analizo si el grupo participa - grupo ABIERTO
@@ -207,12 +211,12 @@ sub ganadores_por_sorteo
 
 sub ganadores_por_licitacion
 {
-	my $csv_sorteo = Text::CSV->new({ caracter => ';' });
-	my $file_sorteo = "archivo sorteo";	#TODO: poner nombre archivo correcto
+	my $csv_sorteo = Text::CSV->new({ sep_char => ';' });
+	my $file_sorteo = "$PROCDIR/sorteos/$archivo_sorteo";
 	open(my $data_sorteo, '<', $file_sorteo) or die "No se puede abrir el archivo '$file_sorteo' $!\n";
 
-	my $csv_validas = Text::CSV->new({ caracter => ';' });
-	my $file_validas= "archivo validas"; #TODO: poner nombre archivo correcto
+	my $csv_validas = Text::CSV->new({ sep_char => ';' });
+	my $file_validas= "$PROCDIR/validas/$fecha_adj";
 	open(my $data_validas, '<', $file_validas) or die "No se puede abrir el archivo '$file_validas' $!\n";
 	
 	my $mayor_oferta = 0;
@@ -295,7 +299,7 @@ sub analizar_grupos
 
 sub mostrar_resultados_grupo
 {
-	#TODO: poner el titulo
+	print "Ganadores por Grupo en el acto de adjudicación de fecha $fecha_adj, Sorteo: $idSorteo)";
 	foreach my $s (keys %ganadores_sorteo)
 	{
 		print "$s - $ganadores_sorteo{$s}[0] S $ganadores_sorteo{$s}[2]\n";
@@ -305,7 +309,7 @@ sub mostrar_resultados_grupo
 
 sub mostrar_ganadores_licitacion
 {
-	#TODO: poner el titulo
+	print "Ganadores por Licitación $idSorteo de fecha $fecha_adj";
 	foreach my $g (keys %ganadores_licitacion)
 	{
 		print "Ganador por licitación del grupo $g: Numero de orden $ganadores_licitacion{$g}[0],  $ganadores_licitacion{$g}[2] con $ganadores_licitacion{$g}[1] (Nro de Sorteo  $ganadores_licitacion{$g}[3])\n";
@@ -314,7 +318,7 @@ sub mostrar_ganadores_licitacion
 
 sub mostrar_ganadores_sorteo
 {
-	#TODO: poner el titulo
+	print "Ganadores del Sorteo $idSorteo de fecha $fecha_adj";
 	foreach my $g (keys %ganadores_sorteo)
 	{
 		print "Ganador por sorteo del grupo $g Nro de Orden: $ganadores_sorteo{$g}[0], $ganadores_sorteo{$g}[2] (Nro deSorteo $ganadores_sorteo{$g}[1])\n";
@@ -323,8 +327,8 @@ sub mostrar_ganadores_sorteo
 
 sub mostrar_resutado_general
 {
-	my $csv = Text::CSV->new({ caracter => ';' });
-	my $file = "archivo sorteo";	#TODO: poner nombre archivo correcto
+	my $csv = Text::CSV->new({ sep_char => ';' });
+	my $file = "$PROCDIR/sorteos/$archivo_sorteo";
 	open(my $data, '<', $file) or die "No se puede abrir el archivo '$file' $!\n";
 	while (my $line = <$data>)
 	{
