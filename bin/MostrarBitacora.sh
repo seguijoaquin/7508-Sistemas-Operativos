@@ -59,34 +59,37 @@ function buscarTipo()
 
 function mostrarBitacora()
 {
-	grep "$TIPOEXT" $1 | sed -n "1,$LINEAS"p
+	grep "$TIPOEXT" $1 | grep "$2" | sed -n "1,$LINEAS"p
 }
 
 # Inicializo las variables
 PROCESO=""
 LINEAS=""
 TYPE=""
+STRING=""
 
-while getopts "p:l:t:" OPCION
+while getopts "p:l:t:s:" OPCION
 do case "$OPCION" in
 	p)PROCESO="$OPTARG";; 
 	l)LINEAS="$OPTARG";;
 	t)TYPE="$OPTARG";;
+	s)STRING="$OPTARG"
 	?) echo "Opcion Inexistente: -$OPTARG" 
 		exit 1;; 
 esac
 done
 
-if [[  $PROCESO == "" || $LINEAS == "" ]]
+if [[ $PROCESO == "" || $LINEAS == "" ]]
 then
 	echo "No se han recibido los parametros necesarios:
 		-p <nombre_proceso> : nombre del proceso que se desea mostrar su log
 		-l <cant_lineas> : cantidad de lineas que se desean visualizar
-		-t <tipo_loggeo> : tipo de entradas en la bitacora que se desean visualizar (INFO-WAR-ERR)"
+		-t <tipo_loggeo> : tipo de entradas en la bitacora que se desea visualizar (INFO-WAR-ERR)
+		-s <string_a_buscar> : string a buscar en la bitacora que se desea visualizar"
 	exit 1
 else
 	buscarBitacora
 	buscarTipo
-	mostrarBitacora $ARCHIVO_BITACORA
+	mostrarBitacora $ARCHIVO_BITACORA $STRING
 fi
 
