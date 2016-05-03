@@ -69,7 +69,7 @@ function buscarTipo()
 function existenciaBitacora() {
 	if [[ ! -f $ARCHIVO_BITACORA ]]
 	then
-		echo "No existe Log para $PROCESO"
+		echo "No existe bitacora para el proceso: $PROCESO"
 	else
 		EXISTE_BITACORA=true
 	fi
@@ -128,7 +128,7 @@ done
 if [[ $PROCESO == "" || $LINEAS == "" ]]
 then
 	echo "No se han recibido los parametros necesarios:
-		-p <nombre_proceso> : nombre del proceso que se desea mostrar su log
+		-p <nombre_proceso> : nombre del proceso que se desea mostrar su bitacora
 		-l <cant_lineas> : cantidad de lineas que se desean visualizar
 		-t <tipo_loggeo> : tipo de entradas en la bitacora que se desea visualizar (INFO-WAR-ERR)
 		-s <string_a_buscar> : string a buscar en la bitacora que se desea visualizar"
