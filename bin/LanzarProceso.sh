@@ -95,7 +95,7 @@ then
 						echo "LanzarProceso: No se puede lanzar "$procesoAEjecutar" porque no existe"
 					fi
 					pause 'Press [Enter] key to continue...'
-					return 1
+					exit 1
 
 				fi
 
@@ -115,7 +115,7 @@ then
 					echo "LanzarProceso: No se puede lanzar "$procesoAEjecutar" porque ya esta en ejecucion"
 				fi
 				pause 'Press [Enter] key to continue...'
-				return 1
+				exit 1
 
 			else
 
@@ -140,11 +140,11 @@ then
 						then
 							"$logLanzarProceso" "$procesoQueLoInvoca" "$procesoAEjecutar se inicio correctamente con id: <$procesoAEjecutar_ID>" "INFO"
 							pause 'Press [Enter] key to continue...'
-							return 0
+							exit 0
 						else
 							"$logLanzarProceso" "$procesoQueLoInvoca" "$procesoAEjecutar no se pudo iniciar" "ERR"
 							pause 'Press [Enter] key to continue...'
-							return 1
+							exit 1
 						fi
 
 					else
@@ -153,11 +153,11 @@ then
 						then
 							echo "LanzarProceso: "$procesoAEjecutar" se inicio correctamente id: <$procesoAEjecutar_ID>"
 							pause 'Press [Enter] key to continue...'
-							return 0
+							exit 0
 						else
 							echo "LanzarProceso: "$procesoAEjecutar" no se pudo iniciar"
 							pause 'Press [Enter] key to continue...'
-							return 1
+							exit 1
 						fi
 
 					fi
@@ -171,7 +171,7 @@ then
 		else
 			echo "LanzarProceso: cantidad de parametros incorrecta"
 			pause 'Press [Enter] key to continue...'
-			return 1
+			exit 1
 		fi
 
 	else
@@ -181,5 +181,5 @@ then
 else
 	echo "LanzarProceso: No se puede iniciar si no esta inicializado el ambiente"
 	pause 'Press [Enter] key to continue...'
-	return 1
+	exit 1
 fi

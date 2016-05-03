@@ -96,7 +96,7 @@ then
 					echo "Detener: No se puede detener $procesoAEjecutar porque no esta en ejecucion"
 				fi
 				pause 'Press [Enter] key to continue...'
-				return 1
+				exit 1
 
 			fi
 
@@ -128,11 +128,11 @@ then
 					then
 						"$logDetenerProceso" "$procesoQueLoInvoca" "$procesoAEjecutar se detuvo correctamente"
 						pause 'Press [Enter] key to continue...'
-						return 0
+						exit 0
 					else
 						"$logDetenerProceso" "$procesoQueLoInvoca" "$procesoAEjecutar no se pudo detener" "ERR"
 						pause 'Press [Enter] key to continue...'
-						return 1
+						exit 1
 					fi
 
 				else
@@ -141,11 +141,11 @@ then
 					then
 						echo "Detener: "$procesoAEjecutar" se detuvo correctamente"
 						pause 'Press [Enter] key to continue...'
-						return 0
+						exit 0
 					else
 						echo "Detener: "$procesoAEjecutar" no se pudo detener"
 						pause 'Press [Enter] key to continue...'
-						return 1
+						exit 1
 					fi
 
 				fi
@@ -163,17 +163,17 @@ then
 		else
 			echo "Detener: no existe "$logDetenerProceso""
 			pause 'Press [Enter] key to continue...'
-			return 1
+			exit 1
 		fi
 
 	else
 		echo "Detener: cantidad de parametros incorrecta"
 		pause 'Press [Enter] key to continue...'
-		return 1
+		exit 1
 	fi
 
 else
 	echo "Detener: No se puede iniciar si no esta inicializado el ambiente"
 	pause 'Press [Enter] key to continue...'
-	return 1
+	exit 1
 fi
