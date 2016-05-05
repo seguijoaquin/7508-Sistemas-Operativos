@@ -250,4 +250,3 @@ do
 	msg1=""
 done
 ./GrabarBitacora.sh "ProcesarOfertas" "Fin de ProcesarOfertas" "INFO"
-PROCESARENEJECUCION=false

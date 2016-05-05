@@ -71,11 +71,11 @@ function MoverArchivos {
 		if [ ! -e "${dir_destino}/dpl/${filename_destino}" ]
 		then
 			mv "$origen" "${dir_destino}/dpl/${filename_destino}"
-			./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo ya existe en destino, se almacena como duplicado. Origen: \"$origen\". Destino: \"$destino\"."
+			./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo ya existe en destino, se almacena como duplicado. Origen: \"$origen\". Destino: \"$destino\"." "WAR"
 		else
 			sec_duplicados=`expr $sec_duplicados + 1`
 			mv "$origen" "${dir_destino}/dpl/${filename_destino}.${contador}"
-			./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo ya existe en destino y como duplicado, se renombra. Origen: \"$origen\". Destino: \"$destino\"."
+			./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo ya existe en destino y como duplicado, se renombra. Origen: \"$origen\". Destino: \"$destino\"." "WAR"
 		fi
 	
 	fi

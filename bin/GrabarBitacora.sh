@@ -4,7 +4,7 @@
 #Verifico que tenga la cantidad de parametros necesarios
 if [ $# -ne 3 ]
 then
-	echo "Cantidad de parametros invalidos"
+	echo -e "Cantidad de parametros invalidos (se esperaban 3, se recibieron $#)"
 	exit 1
 fi
 

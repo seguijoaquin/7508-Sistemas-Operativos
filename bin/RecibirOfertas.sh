@@ -175,6 +175,7 @@ function procesarNovedades
 #----------------------------------------Bucle Principal----------------------------------------#
 #-----------------------------------------------------------------------------------------------#
 
+PROC_ID=0
 ./GrabarBitacora.sh "RecibirOfertas" "                     NUEVA EJECUCION" "INFO"
 while [[ true ]]
 do
@@ -193,15 +194,15 @@ do
 
 	if hayArchivos $OKDIR
 	then
-		if ! $PROCESARENEJECUCION
+		# si el proceso está en ejecución
+		if ((PROC_ID != 0)) && kill -0 "$PROC_ID" >/dev/null 2>&1
 		then
-			./GrabarBitacora.sh "RecibirOfertas" "ProcesarOfertas corriendo bajo el no.: <Process Id de ProcesarOfertas>" "INFO"
-			PROCESARENEJECUCION=true
-			./ProcesarOfertas.sh &
+			./GrabarBitacora.sh "RecibirOfertas" "Invocación de ProcesarOfertas pospuesta para el siguiente ciclo ya que se encuentra en ejecución con el PID <$PROC_ID>" "INFO"
 		else
-			./GrabarBitacora.sh "RecibirOfertas" "Invocación de ProcesarOfertas pospuesta para el siguiente ciclo" "INFO"
+			./ProcesarOfertas.sh &
+			PROC_ID=$!
+			./GrabarBitacora.sh "RecibirOfertas" "ProcesarOfertas corriendo bajo el no.: <$PROC_ID>" "INFO"
 		fi
 	fi
 	sleep $SLEEPTIME
 done
-
