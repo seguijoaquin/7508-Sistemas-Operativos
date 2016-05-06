@@ -9,6 +9,8 @@ ERROR_COLOR='\033[0;31m'
 NC='\033[0m' #no color
 DIRECTORIO_COLOR='\e[93m'
 ARCHIVO_COLOR='\e[93m'
+ROJO='\033[0;31m'
+VERDE='\e[0;32m'
 
 printError () {
 	echo -e "${ERROR_COLOR}ERROR: $1 ${NC}"
@@ -442,11 +444,12 @@ arranqueRecibirOfertas () {
 
 				return 0 ;;
 
-			No)	echo "El proceso RecibirOfertas no se iniciara"
+			No) echo
+				echo -e "${ROJO}El proceso RecibirOfertas no se iniciara${NC}"
 				echo "Puede iniciarlo manualmente a traves del comando:"
-				echo "LanzarProceso.sh"
+				echo -e "${VERDE}LanzarProceso.sh${NC}"
 				echo "y para luego detenerlo invocar el siguiente comando:"
-				echo "DetenerProceso.sh"
+				echo -e "${VERDE}DetenerProceso.sh${NC}"
 				return 0 ;;
 
 			*) echo "La respuesta solicitada no es valida por favor ingrese nuevamente: Recuerde que las opciones son 1 o 2 respectivamente"
@@ -520,6 +523,7 @@ if [ "$?" =  1 ]; then
 	arranqueRecibirOfertas
 
 	AMBIENTE_INICIALIZADO=true
+	export AMBIENTE_INICIALIZADO
 
 else # -------------------------------------------
 
