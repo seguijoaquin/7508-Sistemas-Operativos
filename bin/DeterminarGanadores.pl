@@ -129,6 +129,11 @@ sub obtener_info_grupos
 
 sub ganadores_por_sorteo
 {
+	if ($graba_file)
+	{
+		mostrar_resutado_general($file_sorteo_out);
+	}
+
 	my $csv_sorteo = Text::CSV->new({ sep_char => ';' }) or die "Cannot use CSV: ".Text::CSV->error_diag ();
 	my $file_sorteo = "$PROCDIR/sorteos/$archivo_sorteo";
 	open(my $data_sorteo, '<:encoding(iso8859-1)', $file_sorteo) or die "No se puede abrir el archivo '$file_sorteo' $!\n";
@@ -189,10 +194,6 @@ sub ganadores_por_sorteo
 				for my $p (keys %padron)
 				{
 					my $numero_de_sorteo = @{$info_sorteo{$p}}[1];
-					if ($graba_file)
-					{
-						print $file_sorteo_out "Numero de Sorteo $numero_de_sorteo, le corresponde al orden $p\n";
-					}
 					if ($numero_de_sorteo < $numero_menor)
 					{
 						$numero_menor = $numero_de_sorteo;
@@ -451,6 +452,8 @@ sub mostrar_ganadores_sorteo
 
 sub mostrar_resutado_general
 {
+	my ($output) = @_;
+	$output = $output || *STDOUT;
 	my $csv = Text::CSV->new({ sep_char => ';' });
 	my $file = "$PROCDIR/sorteos/$archivo_sorteo";
 	open(my $data, '<:encoding(iso8859-1)', $file) or die "No se puede abrir el archivo '$file' $!\n";
@@ -460,7 +463,7 @@ sub mostrar_resutado_general
 		if ($csv->parse($line))
 		{
 			my @fields = $csv->fields();
-			print "Nro. de Sorteo $fields[0], le correspondió al número de orden $fields[1]\n";
+			print $output "Nro. de Sorteo $fields[0], le correspondió al número de orden $fields[1]\n";
 		}
 		else
 		{
@@ -508,7 +511,7 @@ sub mostrar_ayuda
 
 sub limpiar_pantalla
 {
-	# system("clear");
+	system("clear");
 }
 
 # Esto nos permite usar un lock sin tener que crear un nuevo archivo,
