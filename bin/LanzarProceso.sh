@@ -3,11 +3,6 @@
 cantParam=$#
 hayFuncion=0
 
-function pause() {
-	read -p "$*"
-}
-
-
 #Chequeo ambiente
 if [ "$BINDIR" != "" ]
 then
@@ -29,8 +24,7 @@ then
 		funcionLanzarProceso="$binPath"'RecibirOfertas.sh'
 
 		#Armo GrabarBitacora
-		#logLanzarProceso="$binPath"'GrabarBitacora.sh'
-		logLanzarProceso="./GrabarBitacora.sh"
+		logLanzarProceso="$binPath"'GrabarBitacora.sh'
 
 		#Chequeo que exista GrabarBitacora
 		if [ -e "$logLanzarProceso" ]
@@ -90,11 +84,10 @@ then
 					if [ "$hayFuncion" -eq 1 ] #ES INVOCADO DESDE DENTRO DE UN SCRIPT
 					then
 						comandoGrabarBitacora=$(echo ${procesoQueLoInvoca%.sh})
-						"$logLanzarProceso" "$procesoQueLoInvoca" "No se puede lanzar $procesoAEjecutar porque no existe" "ERR"
+						"$logLanzarProceso" "$comandoGrabarBitacora" "No se puede lanzar $procesoAEjecutar porque no existe" "ERR"
 					else
 						echo "LanzarProceso: No se puede lanzar "$procesoAEjecutar" porque no existe"
 					fi
-					pause 'Press [Enter] key to continue...'
 					exit 1
 
 				fi
@@ -110,11 +103,10 @@ then
 				if [ "$hayFuncion" -eq 1 ]
 				then
 					comandoGrabarBitacora=$(echo ${procesoQueLoInvoca%.sh})
-					"$logLanzarProceso" "$procesoQueLoInvoca" "No se puede lanzar $procesoAEjecutar porque ya esta en ejecucion" "ERR"
+					"$logLanzarProceso" "$comandoGrabarBitacora" "No se puede lanzar $procesoAEjecutar porque ya esta en ejecucion" "ERR"
 				else
 					echo "LanzarProceso: No se puede lanzar "$procesoAEjecutar" porque ya esta en ejecucion"
 				fi
-				pause 'Press [Enter] key to continue...'
 				exit 1
 
 			else
@@ -126,24 +118,17 @@ then
 					#Arranco proceso
 					"$funcionLanzarProceso" &
 					resultadoLanzarProceso=$?
-					ps_Out=$(ps -eo pid,args) # correr separado para que ps no muestre a grep corriendo
-					procesoAEjecutar_ID=$( echo "$ps_Out" | grep "$procesoAEjecutar" )
-					procesoAEjecutar_ID=( $procesoAEjecutar_ID )
-					procesoAEjecutar_ID=${procesoAEjecutar_ID[0]}
 
 					#Logeo
 					if [ "$hayFuncion" -eq 1 ]
 					then
 						comandoGrabarBitacora=$(echo ${procesoQueLoInvoca%.sh})
-
 						if [ $resultadoLanzarProceso -eq 0 ]
 						then
-							"$logLanzarProceso" "$procesoQueLoInvoca" "$procesoAEjecutar se inicio correctamente con id: <$procesoAEjecutar_ID>" "INFO"
-							pause 'Press [Enter] key to continue...'
+							"$logLanzarProceso" "$comandoGrabarBitacora" "$procesoAEjecutar se inicio correctamente" "INFO"
 							exit 0
 						else
-							"$logLanzarProceso" "$procesoQueLoInvoca" "$procesoAEjecutar no se pudo iniciar" "ERR"
-							pause 'Press [Enter] key to continue...'
+							"$logLanzarProceso" "$comandoGrabarBitacora" "$procesoAEjecutar no se pudo iniciar" "ERR"
 							exit 1
 						fi
 
@@ -151,12 +136,10 @@ then
 
 						if [ $resultadoLanzarProceso -eq 0 ]
 						then
-							echo "LanzarProceso: "$procesoAEjecutar" se inicio correctamente id: <$procesoAEjecutar_ID>"
-							pause 'Press [Enter] key to continue...'
+							echo "LanzarProceso: "$procesoAEjecutar" se inicio correctamente"
 							exit 0
 						else
 							echo "LanzarProceso: "$procesoAEjecutar" no se pudo iniciar"
-							pause 'Press [Enter] key to continue...'
 							exit 1
 						fi
 
@@ -170,7 +153,6 @@ then
 
 		else
 			echo "LanzarProceso: cantidad de parametros incorrecta"
-			pause 'Press [Enter] key to continue...'
 			exit 1
 		fi
 
@@ -180,6 +162,5 @@ then
 
 else
 	echo "LanzarProceso: No se puede iniciar si no esta inicializado el ambiente"
-	pause 'Press [Enter] key to continue...'
 	exit 1
 fi
