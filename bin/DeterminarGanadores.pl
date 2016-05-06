@@ -8,7 +8,6 @@ use constant {
 
 use Getopt::Std;
 use strict;
-use Switch;
 use warnings;
 use Text::CSV;
 
@@ -68,36 +67,33 @@ sub procesar
 		$input = <STDIN>;
 		chomp($input);
 
-		switch ($input)
+		if ($input == '1')
 		{
-			case '1'
-			{
-				$input = '';
-				mostrar_resutado_general();
-				$input = <STDIN>;
-				$input = '';
-			}
-			case '2'
-			{
-				$input = '';
-				mostrar_ganadores_sorteo();
-				$input = <STDIN>;
-				$input = '';
-			}
-			case '3'
-			{
-				$input = '';
-				mostrar_ganadores_licitacion();
-				$input = <STDIN>;
-				$input = '';
-			}
-			case '4'
-			{
-				$input = '';
-				mostrar_resultados_grupo();
-				$input = <STDIN>;
-				$input = '';
-			}
+			$input = '';
+			mostrar_resutado_general();
+			$input = <STDIN>;
+			$input = '';
+		}
+		elsif ($input == '2')
+		{
+			$input = '';
+			mostrar_ganadores_sorteo();
+			$input = <STDIN>;
+			$input = '';
+		}
+		elsif ($input == '3')
+		{
+			$input = '';
+			mostrar_ganadores_licitacion();
+			$input = <STDIN>;
+			$input = '';
+		}
+		elsif ($input == '4')
+		{
+			$input = '';
+			mostrar_resultados_grupo();
+			$input = <STDIN>;
+			$input = '';
 		}
 	}
 }
