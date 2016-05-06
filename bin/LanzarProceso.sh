@@ -152,12 +152,12 @@ then
 			fi
 
 		else
-			echo "LanzarProceso: cantidad de parametros incorrecta"
-			exit 1
+			echo "LanzarProceso: no existe "$logLanzarProceso""
 		fi
 
 	else
-		echo "LanzarProceso: no existe "$logLanzarProceso""
+		echo "LanzarProceso: cantidad de parametros incorrecta"
+		exit 1
 	fi
 
 else

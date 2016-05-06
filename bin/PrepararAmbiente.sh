@@ -10,10 +10,6 @@ NC='\033[0m' #no color
 DIRECTORIO_COLOR='\e[93m'
 ARCHIVO_COLOR='\e[93m'
 
-function pause() {
-	read -p "$*"
-}
-
 printError () {
 	echo -e "${ERROR_COLOR}ERROR: $1 ${NC}"
 }
@@ -221,7 +217,6 @@ repararInstalacion () {
 				if (! "$BACKUPDIR_INST" ) then
 					printError "No se puede reparar la instalacion. Faltan archivos de respaldo"
 					echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
-					pause 'Press [Enter] key to continue...'
 					exit 1
 				fi
 
@@ -230,7 +225,6 @@ repararInstalacion () {
 				if [[ "$?" = 1 ]]; then
 					printError "No se pudieron copiar algunos archivos"
 					echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
-					pause 'Press [Enter] key to continue...'
 					exit 1
 				fi
 
@@ -238,7 +232,6 @@ repararInstalacion () {
 
 			No)	printError "El ambiente no pudo iniciarse correctamente"
 				echo "La instalacion no ha sido reparada"
-				pause 'Press [Enter] key to continue...'
 				exit 1 ;;
 
 			*) echo "La respuesta solicitada no es valida por favor ingrese nuevamente: Recuerde que las opciones son 1 o 2 respectivamente"
@@ -465,7 +458,6 @@ arranqueRecibirOfertas () {
 chequearSourced() {
 	if [[ $0 == $BASH_SOURCE ]]; then
 		printError "Este script debe ser llamado de la forma '. PrepararAmbiente.sh' para configurar las variables de entorno correctamente"
-		pause 'Press [Enter] key to continue...'
 		exit 1
 	fi
 }
@@ -492,7 +484,6 @@ if [ "$?" =  1 ]; then
 		echo -e "Uso: PrepararAmbiente.sh CONF \n"
 		echo -e "CONF es la ruta al archivo de configuración, que puede ser generado por INSTALL.sh."
 		echo -e "Por ejemplo \"/home/usuario/CIPAK/CIPAK.cnf\" \n"
-		pause 'Press [Enter] key to continue...'
 		return 1
 	fi
 
@@ -512,7 +503,6 @@ if [ "$?" =  1 ]; then
 		#Archivo de configuracion invalido
 		printError "Archivo de configuracion invalido"
 		echo -e "Por favor realice nuevamente la instalacion invocando a \"\$INSTALL.sh\"\n"
-		pause 'Press [Enter] key to continue...'
 		return 1
 	fi
 
@@ -531,8 +521,6 @@ if [ "$?" =  1 ]; then
 
 	AMBIENTE_INICIALIZADO=true
 
-	pause 'Press [Enter] key to continue...'
-
 else # -------------------------------------------
 
 	# Ambiente inicializado
@@ -543,7 +531,5 @@ else # -------------------------------------------
 
 	# Log del mensaje y sus respectivos datos.
 	GrabarBitacora.sh "PrepararAmbiente" "$MSJ" "INFO"
-
-	pause 'Press [Enter] key to continue...'
 
 fi

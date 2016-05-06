@@ -149,7 +149,7 @@ function initInstalation(){
 	OKDIR=$pathTemp
 	echo "OKDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
 
-	#llamadas sospechosas -> PROCDIR
+	#Ofertas procesadas -> PROCDIR
 	getDirectoryPath "Defina el directorio de grabación de los registros ofertas procesadas ($PROCDIR):" "$PROCDIR"
 	PROCDIR=$pathTemp
 	echo "PROCDIR=$pathTemp=$USER=`date +'%d-%m-%Y %H:%M:%S'`" >> $CONFIGFILETEMP
