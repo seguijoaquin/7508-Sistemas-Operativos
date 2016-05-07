@@ -55,12 +55,12 @@ function calcularFechaProximoActo()
 
 function existeDuplicado()
 {
-	archivoDuplicado=`ls -1 $PROCESADOS | grep "$1"`
-	if [[ ! -z $archivoDuplicado ]]
-	then # El archivo esta duplicado
-		return 0
-	fi # El archivo NO esta duplicado
-	return 1
+	local archivoDuplicado=`ls -1 $PROCESADOS | grep $1`
+	if [[ -z $archivoDuplicado ]]
+	then # El archivo NO esta duplicado
+		return 1
+	fi # El archivo esta duplicado
+	return 0
 }
 
 function formatoCamposValido()
@@ -199,7 +199,7 @@ do
 	# Proceso los archivos
 
 	# 2.1 Verificar que no sea un archivo duplicado
-	if [ ! `existeDuplicado $archivo` ]
+	if ! existeDuplicado $archivo
 	then
 		# 2.2 Verificar los campos del primer registro
 		if formatoCamposValido $archivo
@@ -232,6 +232,7 @@ do
 		fi
 	else
 		archivoOfertaAceptado=false
+		#echo "Archivo $archivo duplicado"
 		msg1="Se rechaza el archivo $archivo por estar DUPLICADO"
 	fi
 	cantidadOfertasValidas=0
