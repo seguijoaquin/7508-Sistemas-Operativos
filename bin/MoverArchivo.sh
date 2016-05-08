@@ -19,6 +19,18 @@ fi
 
 #source Log.sh
 
+function existeDuplicado()
+{
+	#1: Directorio destino
+	#2: Nombre archivo a mover
+	local archivoDuplicado=`ls -1 $1 | grep $2`
+	if [[ -z $archivoDuplicado ]]
+	then # El archivo NO esta duplicado
+		return 1
+	fi # El archivo esta duplicado
+	return 0
+}
+
 function MoverArchivos {
 	origen=$1
 	destino=$2
@@ -62,21 +74,21 @@ function MoverArchivos {
 	fi
 
 	#valido si ya existe el file en destino
-	if [ ! -e "$destino" ]
+	if ! existeDuplicado $dir_destino $filename_destino
 	then
 		mv "$origen" "$destino"
 		./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo fue movido. Origen: \"$origen\". Destino: \"$destino\"." "INFO"
 	else
 		mkdir -p "${dir_destino}/dpl"
-		if [ ! -e "${dir_destino}/dpl/${filename_destino}" ]
+		if ! existeDuplicado "${dir_destino}/dpl" $filename_destino
 		then
 			mv "$origen" "${dir_destino}/dpl/${filename_destino}"
 			./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo ya existe en destino, se almacena como duplicado. Origen: \"$origen\". Destino: \"$destino\"." "WAR"
 		else
-			sec_duplicados=`expr $sec_duplicados + 1`
-			mv "$origen" "${dir_destino}/dpl/${filename_destino}.${contador}"
-			./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo ya existe en destino y como duplicado, se renombra. Origen: \"$origen\". Destino: \"$destino\"." "WAR"
+			duplicaciones=`ls -1 "${dir_destino}/dpl" | grep "$filename_destino" | wc -l`
+			mv "$origen" "$dir_destino/dpl/$filename_destino.$duplicaciones"
+			./GrabarBitacora.sh "$comando_inv" "MoverArchivos: El archivo ya existe en destino y como duplicado, se renombra. Origen: \"$origen\". Destino: \"$destino.$duplicaciones\"." "WAR"
 		fi
-	
 	fi
 }  
+

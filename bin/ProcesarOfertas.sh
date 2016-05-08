@@ -55,7 +55,9 @@ function calcularFechaProximoActo()
 
 function existeDuplicado()
 {
-	local archivoDuplicado=`ls -1 $PROCESADOS | grep $1`
+	# $1 Carpeta de busqueda
+	# $2 Archivo a buscar
+	local archivoDuplicado=`ls -1 $1 | grep $2`
 	if [[ -z $archivoDuplicado ]]
 	then # El archivo NO esta duplicado
 		return 1
@@ -199,7 +201,7 @@ do
 	# Proceso los archivos
 
 	# 2.1 Verificar que no sea un archivo duplicado
-	if ! existeDuplicado $archivo
+	if ! existeDuplicado $PROCESADOS $archivo
 	then
 		# 2.2 Verificar los campos del primer registro
 		if formatoCamposValido $archivo
