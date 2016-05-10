@@ -178,8 +178,28 @@ function grabarOfertaValida()
 	auxNombre=`grep --text "^${oferta:0:4};${oferta:4:3}" $SUSCRIPTORES | cut -f 3 -d";"` # Nombre del suscriptor
 	auxUser=$USER # Usuario
 	auxFechaActual="$(date +%d)/$(date +%m)/$(date +%Y)" # Fecha
-	registroOferta="$auxConcesionario;$auxFechaArchivo;$auxContrato;$auxGrupo;$auxNroOrden;${auxImporteOfertado:0:-1};$auxNombre;$auxUser;$auxFechaActual"
-	echo $registroOferta >> $ACEPTADOS/$fechaProxActo
+
+	# Verifico que el suscriptor no haya ofertado anteriormente
+	if [ -f $ACEPTADOS/$fechaProxActo ]
+	then # Verifico la existencia del archivo de ofertas validas
+		# Caso que existe, verifico con contrato
+		coincidencia=`grep "$auxContrato;$auxGrupo;$auxNroOrden" $ACEPTADOS/$fechaProxActo`
+		if [[ -z $coincidencia ]]
+		then
+			registroOferta="$auxConcesionario;$auxFechaArchivo;$auxContrato;$auxGrupo;$auxNroOrden;${auxImporteOfertado:0:-1};$auxNombre;$auxUser;$auxFechaActual"
+			echo $registroOferta >> $ACEPTADOS/$fechaProxActo
+			let cantidadOfertasValidas++
+
+		else
+			msg="EL SUSCRIPTOR YA OFERTO ANTERIORMENTE."
+			grabarOfertaInvalida $oferta $archivo
+			let cantidadOfertasRechazadas++
+		fi
+	else
+		registroOferta="$auxConcesionario;$auxFechaArchivo;$auxContrato;$auxGrupo;$auxNroOrden;${auxImporteOfertado:0:-1};$auxNombre;$auxUser;$auxFechaActual"
+		echo $registroOferta >> $ACEPTADOS/$fechaProxActo
+		let cantidadOfertasValidas++
+	fi
 }
 
 #--------------------------------------------------------------------------------------------------------#
@@ -212,13 +232,13 @@ do
 			msg1="El archivo $archivo fue aceptado"
 
 			# 4 Validar oferta
-			for oferta in `more "$OKDIR/$archivo"`
+			for oferta in `cat "$OKDIR/$archivo"`
 			do
 				if ofertaValida $oferta
 				then
 					# 5 Grabar oferta valida en el registro de ofertas validas
 					grabarOfertaValida $oferta $archivo
-					let cantidadOfertasValidas++
+					#let cantidadOfertasValidas++
 				else
 					# 6 Rechazar oferta, en el caso que alguna de las validaciones sea invalida,
 					# grabando en el registro de ofertas rechazadas
