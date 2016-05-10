@@ -51,3 +51,25 @@ Para instalar el sistema:
 
 Para inicializar las variables:
 
+Ingresar al directorio BIN definido en la instalación y ejecutar:
+
+`$ . PrepararAmbiente.sh ../config/CIPAK.cnf`
+
+
+En caso de no haber problema con la inicialización se brindará la posibilidad de iniciar el proceso RecibirOfertas, aparecerá un cartel preguntando esto y se debe ingresar:
+
+`$ 1 `  si se quiere iniciarlo.
+
+`$ 2 `  si no.
+
+Si no se inicia RecibirOfertas automáticamente, éste puede iniciarse en cualquier momento desde la línea de comandos escribiendo:
+
+`$ ./LanzarProceso.sh`
+
+Para detener el proceso desde la línea de comandos se debe escribir:
+
+`$ ./DetenerProceso.sh`
+
+En caso de tener problemas con la inicialización siga las instrucciones que le recomendará el programa luego de emitir el     error.
+
+
